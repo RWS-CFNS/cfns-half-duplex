@@ -113,3 +113,6 @@ python main.py ./devices.csv ./correct
 ## To Do
 
 - Better Parent-Child relationship between Interface class and the inferfaces (UART, I2C ect...)
+
+# Credit
+Credit to Kurt Schwehr and Google for [AISutils](https://github.com/schwehr/noaadata).

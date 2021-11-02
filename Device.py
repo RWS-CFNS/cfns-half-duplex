@@ -66,4 +66,3 @@ AIS device with interface
 # print(aisin.read())
 
 #p1.getname()
-
