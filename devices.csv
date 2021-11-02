@@ -1,2 +1,2 @@
-name,branch,model,interface_type,address,setting
-FiPy, Pycom, FiPy, 2,192.168.178.81,6543
+name,branch,model,interface_type,address,setting,technology
+FiPy, Pycom, FiPy, 2,192.168.178.11,8000,Wifi6

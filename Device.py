@@ -3,11 +3,12 @@ from Interface.Interface import Interface
 
 
 class Device(Interface):
-    def __init__(self, name, branch, model, interface_type):
+    def __init__(self, name, branch, model, interface_type, technology):
         super().__init__(interface_type)
         self.name = name
         self.branch = branch
         self.model = model
+        self.technology = technology
 
     def get_name(self):
         return self.name
@@ -32,7 +33,12 @@ class Device(Interface):
 
     def set_interface(self, new_interface):
         self.interface_type = new_interface
-
+    
+    def get_technology(self):
+        return self.technology
+    
+    def set_technology(self, new_technology):
+        self.technology = new_technology
 
 
 '''

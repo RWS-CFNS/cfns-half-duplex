@@ -39,7 +39,7 @@ class Monitor(PatternMatchingEventHandler):
         message_type = new_file.get_message_type()
 
         for line in new_file.get_lines():
-            print(line)
+            print(f'line: {line}')
 
         data = []
         if message_type == 4:
@@ -76,7 +76,7 @@ class Monitor(PatternMatchingEventHandler):
                 try:
                     d.ethernet.init_socket(d.ethernet.ip_address, d.ethernet.socket_port)
                     d.ethernet.connect_socket()
-                    d.ethernet.write_socket([dab_id, message_type])
+                    d.ethernet.write_socket([dab_id, message_type, d.get_technology()])
                     d.ethernet.close_socket()
                 except ("There is no connection with: %s" % d.name):
                     print("Could not send with: %s" % d.name)
@@ -111,7 +111,6 @@ def execute():
 
     # Assign list of devices attached to the system
     event_handler.devices = attach_devices(args.devices)
-
     observer.start()
     print("Monitoring started")
     try:
@@ -139,30 +138,28 @@ def attach_devices(csv_parameter):
                 if line_count == 0:
                     print(f'Column names are {", ".join(row)}')
                     line_count += 1
-
+                    
+                device = Device(row["name"], row["branch"], row["model"], int(row["interface_type"]), row["technology"])
                 if int(row["interface_type"]) == 0:
                     print(row["name"])
-                    ais = Device(row["name"], row["branch"], row["model"], int(row["interface_type"]))
-                    ais.rs232.init_serial(row["address"], int(row["setting"]))
-                    listed_devices.append(ais)
+                    device.rs232.init_serial(row["address"], int(row["setting"]))
+                    listed_devices.append(device)
 
                 if int(row["interface_type"]) == 1:
                     print(row["name"])
-                    lora = Device(row["name"], row["branch"], row["model"], int(row["interface_type"]))
-                    lora.i2c.init_i2c(int(row["address"]))
-                    listed_devices.append(lora)
+                    device.i2c.init_i2c(int(row["address"]))
+                    listed_devices.append(device)
 
                 if int(row["interface_type"]) == 2:
                     print(row["name"])
-                    lan = Device(row["name"], row["branch"], row["model"], int(row["interface_type"]))
-                    lan.ethernet.init_socket(row["address"], int(row["setting"]))
-                    listed_devices.append(lan)
+                    device.ethernet.init_socket(row["address"], int(row["setting"]))
+                    listed_devices.append(device)
 
                 if int(row["interface_type"]) == 3:
                     print(row["name"])
-                    lora2 = Device(row["name"], row["branch"], row["model"], int(row["interface_type"]))
-                    lora2.spi.init_spi(int(row["address"]), int(row["setting"]))
-                    listed_devices.append(lora2)
+                    device.spi.init_spi(int(row["address"]), int(row["setting"]))
+                    listed_devices.append(device)
+                    
                 line_count += 1
             print(f'Processed {line_count} lines.')
 
