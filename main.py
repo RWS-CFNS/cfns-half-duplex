@@ -78,7 +78,7 @@ class Monitor(PatternMatchingEventHandler):
                     confirmed = d.ethernet.write_socket([dab_id, message_type, d.get_technology()])
                     d.ethernet.close_socket()
 
-                    # update the file to SKIP when confirmed is false. If confirmed is true update file.confirmed to CONFIRMED
+                    # update the file to SKIP when confirmed is false. If confirmed is true update file.confirmed to CONFIRMED and file is found
                     update_file(dab_id, confirmed)
 
                     # print the status for every file
@@ -96,12 +96,21 @@ class Monitor(PatternMatchingEventHandler):
 
     def update_file(dab_id, confirmed):
         file = find_file(dab_id)
-        file.confirmed = confirmed
-        print("File:", file.get_filename(), file.get_dab_id(), file.get_confirmed())
+
+        if not file:
+            print("File not found")
+            return 
+        else:
+            file.confirmed = confirmed
+            print("File:", file.get_filename(), file.get_dab_id(), file.get_confirmed())
     
     def find_file(dab_id):
         for file in self.folder.files:
-            return file if file.dab_id == dab_id
+            if file.dab_id == dab_id:
+                return file
+            else:
+                continue
+        return False
 
 def execute():
     # create parser

@@ -39,7 +39,8 @@ class File:
         self.message_type = int(self.lines[1])
 
     def set_confirmed(self, confirmed):
-        self.confirmed = confirmed if type(confirmed) is type(self.confirmed)
+        if type(confirmed) == type(self.confirmed):
+            self.confirmed = confirmed
 
     def get_dab_id(self):
         return self.dab_id
