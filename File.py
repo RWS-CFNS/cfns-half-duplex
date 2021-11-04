@@ -19,12 +19,15 @@
 #    along with cfns-half-duplex. If not, see <https://www.gnu.org/licenses/>.
 #
 
+from ConfirmedStatus import ConfirmedStatus
+
 class File:
     def __init__(self, filename):
         self.filename = filename
         self.lines = []
         self.dab_id = 0
         self.message_type = 0
+        self.confirmed = ConfirmedStatus.UNCOFIRMED 
 
     def set_lines(self, path):
         my_lines = []  # Declare an empty list named mylines.
@@ -34,6 +37,9 @@ class File:
         self.lines = my_lines
         self.dab_id = int(self.lines[0])
         self.message_type = int(self.lines[1])
+
+    def set_confirmed(self, confirmed):
+        self.confirmed = confirmed if type(confirmed) is type(self.confirmed)
 
     def get_dab_id(self):
         return self.dab_id
@@ -46,4 +52,7 @@ class File:
 
     def get_lines(self):
         return self.lines
+
+    def get_confirmed(self):
+        return self.confirmed
 

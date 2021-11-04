@@ -62,33 +62,46 @@ class Monitor(PatternMatchingEventHandler):
                         payloadStr, pad = binary.bitvectoais6(aisBits)  # [0]
                         buffer = nmea.bbmEncode(1, 1, 0, 1, 8, payloadStr, pad, appendEOL=False)
                         d.rs232.write_rs232(buffer)
-
-                except ("There is no connection with: %s" % d.name):
+                except:
+                    print("There is no connection with: %s" % d.name)
                     print("Could not send with: %s" % d.name)
-                    pass
             elif d.interface_type == 1:
                 try:
                     d.i2c.write_i2c(dab_id, message_type, data)
-                except ("There is no connection with: %s" % d.name):
+                except:
+                    print("There is no connection with: %s" % d.name)
                     print("Could not send with: %s" % d.name)
-                    pass
             elif d.interface_type == 2:
                 try:
                     d.ethernet.init_socket(d.ethernet.ip_address, d.ethernet.socket_port)
                     d.ethernet.connect_socket()
-                    d.ethernet.write_socket([dab_id, message_type, d.get_technology()])
+                    confirmed = d.ethernet.write_socket([dab_id, message_type, d.get_technology()])
                     d.ethernet.close_socket()
-                except ("There is no connection with: %s" % d.name):
-                    print("Could not send with: %s" % d.name)
 
-                    pass
+                    # update the file to SKIP when confirmed is false. If confirmed is true update file.confirmed to CONFIRMED
+                    update_file(dab_id, confirmed)
+
+                    # print the status for every file
+                    for file in self.folder.files:
+                        print(file.get_confirmed)
+                except:
+                    print("There is no connection with: %s" % d.name)
+                    print("Could not send with: %s" % d.name)
             elif d.interface_type == 3:
                 try:
                     d.spi.write_spi(dab_id, message_type)
-                except ("There is no connection with: %s" % d.name):
+                except:
+                    print("There is no connection with: %s" % d.name)
                     print("Could not send with: %s" % d.name)
-                    pass
 
+    def update_file(dab_id, confirmed):
+        file = find_file(dab_id)
+        file.confirmed = confirmed
+        print("File:", file.get_filename(), file.get_dab_id(), file.get_confirmed())
+    
+    def find_file(dab_id):
+        for file in self.folder.files:
+            return file if file.dab_id == dab_id
 
 def execute():
     # create parser
