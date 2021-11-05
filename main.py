@@ -23,6 +23,16 @@ class Monitor(PatternMatchingEventHandler):
         self.folder = folder
         self.devices = []
 
+    def update_file(dab_id, confirmed):
+        file = self.folder.find_file_by_dab_id(dab_id)
+
+        if not file:
+            print("File not found")
+            return 
+        else:
+            file.set_confirmed(confirmed)
+            print("File:", file.get_filename(), file.get_dab_id(), file.get_confirmed())
+
     def on_created(self, event):
         print(event.src_path, event.event_type)
         time.sleep(1)
@@ -93,24 +103,6 @@ class Monitor(PatternMatchingEventHandler):
                 except:
                     print("There is no connection with: %s" % d.name)
                     print("Could not send with: %s" % d.name)
-
-    def update_file(dab_id, confirmed):
-        file = find_file(dab_id)
-
-        if not file:
-            print("File not found")
-            return 
-        else:
-            file.confirmed = confirmed
-            print("File:", file.get_filename(), file.get_dab_id(), file.get_confirmed())
-    
-    def find_file(dab_id):
-        for file in self.folder.files:
-            if file.dab_id == dab_id:
-                return file
-            else:
-                continue
-        return False
 
 def execute():
     # create parser

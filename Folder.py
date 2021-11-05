@@ -33,6 +33,14 @@ class Folder:
     def get_list_files(self):
         return self.files
 
+    def find_file_by_dab_id(self, dab_id):
+        for file in self.files:
+            if file.dab_id == dab_id:
+                return file
+            else:
+                continue
+        return False
+        
     # def set_list_files(self):
     #     files = []
     #     for x in os.listdir(self.path):
