@@ -105,7 +105,8 @@ class Monitor(PatternMatchingEventHandler):
                     # print the status for every file
                     for file in self.folder.files:
                         print(file.get_confirmed)
-                except:
+                except Exception as e:
+                    print(e)
                     print("There is no connection with: %s" % d.name)
                     print("Could not send with: %s" % d.name)
             elif d.interface_type == 3:
