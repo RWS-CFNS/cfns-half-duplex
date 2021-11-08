@@ -30,7 +30,7 @@ class Monitor(PatternMatchingEventHandler):
             return 
 
         file.set_status(confirmed)
-        print("File:", file.get_filename(), file.get_dab_id(), file.get_status())
+        print("File:", file.get_dab_id(), file.get_status())
 
     def create_confirmation_dict(self, dab_id, message_type, time_of_arrival):
         return {
