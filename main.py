@@ -104,7 +104,7 @@ class Monitor(PatternMatchingEventHandler):
 
                     # print the status for every file
                     for file in self.folder.files:
-                        print(file.get_status)
+                        print(file.get_status())
                 except Exception as e:
                     print(e)
                     print("There is no connection with: %s" % d.name)
