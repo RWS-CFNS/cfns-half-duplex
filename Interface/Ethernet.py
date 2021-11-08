@@ -1,6 +1,14 @@
 import socket
 import json
 
+"""
+    pad the var msg_length to the padding size. 
+    So that the message containing the msg_length has a fixed size of padding size.
+"""
+def pad_msg_length(padding_size, msg_length):
+    msg_length = str(msg_length).encode()
+    msg_length += b' ' * (padding_size - len(msg_length))
+    return msg_length
 
 class Ethernet:
     def __init__(self):
@@ -31,14 +39,14 @@ class Ethernet:
     def close_socket(self):
         self.sock.close()
 
-    def write_socket(self, data):
-        msg_length = 10 # The value is the amount of bytes the first message will be
+    def write_socket(self, confirmation_dict):
+        max_msg_length = 10 # The value is the amount of bytes the first message will be
 
-        buffer = json.dumps({"ack": data[0], "msg": data[1], "tech": data[2]})
-        self.sock.send(str(len(buffer)).encode() + (b' ' * (msg_length - len(buffer))))
+        buffer = json.dumps(confirmation_dict)
+        self.sock.send(pad_msg_length(max_msg_length, len(buffer)))
         self.sock.send(buffer.encode())
         
-        reply_length = self.sock.recv(msg_length).decode()
+        reply_length = self.sock.recv(max_msg_length).decode()
         reply = self.sock.recv(int(reply_length)).decode()
         reply = json.loads(reply)
 

@@ -48,14 +48,14 @@ class I2C:
                 print("No device connected to bus")
                 pass
 
-    def write_i2c(self, dab_id, message_type, data):
+    def write_i2c(self, data):
         try:
             # Write a single byte to address 80
             buff = []
-            buff.append(dab_id)
-            buff.append(message_type)
-            if data:
-                buff.append(data[0])
+            buff.append(data.get("dab_id"))
+            buff.append(data.get("message_type"))
+            if "dab_signal" in data:
+                buff.append(data.get("dab_signal"))
             msg = i2c_msg.write(self.address, buff)
             self.bus.i2c_rdwr(msg)
             print("I2C data send for acknowledgement: ", buff)
