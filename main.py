@@ -22,7 +22,7 @@ class Monitor(PatternMatchingEventHandler):
         self.folder = folder
         self.devices = []
 
-    def update_file(dab_id, confirmed):
+    def update_file(self, dab_id, confirmed):
         file = self.folder.find_file_by_dab_id(dab_id)
 
         if not file:
@@ -32,7 +32,7 @@ class Monitor(PatternMatchingEventHandler):
         file.set_status(confirmed)
         print("File:", file.get_filename(), file.get_dab_id(), file.get_status())
 
-    def create_confirmation_dict(dab_id, message_type, time_of_arrival):
+    def create_confirmation_dict(self, dab_id, message_type, time_of_arrival):
         return {
             "dab_id": dab_id,
             "message_type": message_type,
