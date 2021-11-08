@@ -100,11 +100,11 @@ class Monitor(PatternMatchingEventHandler):
                     d.ethernet.close_socket()
 
                     # update the file to SKIP when confirmed is false. If confirmed is true update file.confirmed to CONFIRMED and file is found
-                    self.update_file(dab_id, confirmed)
+                    self.update_file(data.get("dab_id"), confirmed)
 
                     # print the status for every file
                     for file in self.folder.files:
-                        print(file.get_confirmed)
+                        print(file.get_status)
                 except Exception as e:
                     print(e)
                     print("There is no connection with: %s" % d.name)
