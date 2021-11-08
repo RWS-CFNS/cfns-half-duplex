@@ -60,7 +60,7 @@ class Monitor(PatternMatchingEventHandler):
         for line in new_file.get_lines():
             print(f'line: {line}')
 
-        data = create_confirmation_dict(dab_id, message_type, time_of_arrival)
+        data = self.create_confirmation_dict(dab_id, message_type, time_of_arrival)
         if message_type == 4:
             data["dab_signal"] = get_dab_signal()
 
@@ -100,7 +100,7 @@ class Monitor(PatternMatchingEventHandler):
                     d.ethernet.close_socket()
 
                     # update the file to SKIP when confirmed is false. If confirmed is true update file.confirmed to CONFIRMED and file is found
-                    update_file(dab_id, confirmed)
+                    self.update_file(dab_id, confirmed)
 
                     # print the status for every file
                     for file in self.folder.files:
