@@ -11,6 +11,7 @@ from aisutils import binary
 from Device import Device
 from Folder import Folder
 from File import File
+from Status import Status
 import time
 
 
@@ -21,16 +22,6 @@ class Monitor(PatternMatchingEventHandler):
         PatternMatchingEventHandler.__init__(self, patterns=['*.txt'], ignore_directories=True, case_sensitive=False)
         self.folder = folder
         self.devices = []
-
-    def update_file(self, dab_id, confirmed):
-        file = self.folder.find_file_by_dab_id(dab_id)
-
-        if not file:
-            print("File not found")
-            return 
-
-        file.set_status(confirmed)
-        print("File:", file.get_dab_id(), file.get_status())
 
     def create_confirmation_dict(self, dab_id, message_type, time_of_arrival):
         return {
@@ -96,11 +87,23 @@ class Monitor(PatternMatchingEventHandler):
                     d.ethernet.init_socket(d.ethernet.ip_address, d.ethernet.socket_port)
                     d.ethernet.connect_socket()
                     data["technology"] = d.get_technology()
-                    confirmed = d.ethernet.write_socket(data)
+                    reply = d.ethernet.write_socket(data)
                     d.ethernet.close_socket()
 
-                    # update the file to SKIP when confirmed is false. If confirmed is true update file.confirmed to CONFIRMED and file is found
-                    self.update_file(data.get("dab_id"), confirmed)
+                    if not reply.get("reply") == None:
+                        # Update the file to SKIP when confirmed is false. If confirmed is true update file.confirmed to CONFIRMED and file is found
+                        new_status = Status.CONFIRMED if reply.get("reply") else Status.SKIP
+                        self.folder.update_confirmed_in_file(data.get("dab_id"), status=new_status)
+                    else:
+                        # If the program jumps here then the confirmation succeeded, so change the status to confirmed if the dab_id match otherwise change the data["dab_id"] to Status.SKIP
+                        new_status = Status.CONFIRMED if data.get("dab_id") == reply["ack_information"][0] else 
+                        self.folder.update_confirmed_in_file(data.get("dab_id"), status=new_status, valid=reply["ack_information"][1])
+
+                        for entry in reply.get("AIS_ack_information"):
+                            self.folder.update_confirmed_in_file(entry[0], status=Status.CONFIRMED, valid=entry[1])
+
+                        for entry in reply.get("invalid_dab_confirmations"):
+                            self.folder.update_confirmed_in_file(entry[0], valid=entry[1])
 
                     # print the status for every file
                     for file in self.folder.files:

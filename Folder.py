@@ -40,6 +40,20 @@ class Folder:
             else:
                 continue
         return False
+
+    def update_confirmed_in_file(self, dab_id, **kwargs):
+        file = self.find_file_by_dab_id(dab_id)
+
+        if not file:
+            print("File not found")
+            return 
+
+        for field_in_file, value in kwargs.items():
+            if field_in_file == "status":
+                file.set_status(value)
+            elif field_in_file == "valid":
+                file.set_valid(value)
+
         
     # def set_list_files(self):
     #     files = []

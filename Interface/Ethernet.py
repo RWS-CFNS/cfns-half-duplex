@@ -52,7 +52,7 @@ class Ethernet:
 
         print("Client Sent : ", reply)
 
-        return reply.get("retrieved")
+        return reply
 
     def read_socket(self):
         data, addr = self.sock.recvfrom(4096)
