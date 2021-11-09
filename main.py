@@ -97,7 +97,7 @@ class Monitor(PatternMatchingEventHandler):
                         self.folder.update_confirmed_in_file(data.get("dab_id"), status=new_status)
                     else:
                         # If the program jumps here then the confirmation succeeded, so change the status to confirmed if the dab_id match otherwise change the data["dab_id"] to Status.SKIP
-                        new_status = Status.CONFIRMED if data.get("dab_id") == reply["ack_information"][0] else 
+                        new_status = Status.CONFIRMED if data.get("dab_id") == reply["ack_information"][0] else Status.SKIP
                         self.folder.update_confirmed_in_file(data.get("dab_id"), status=new_status, valid=reply["ack_information"][1])
 
                         for entry in reply.get("AIS_ack_information"):
