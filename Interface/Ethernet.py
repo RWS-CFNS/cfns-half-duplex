@@ -49,6 +49,7 @@ class Ethernet:
         reply_length = self.sock.recv(max_msg_length).decode()
         reply = self.sock.recv(int(reply_length)).decode()
         reply = json.loads(reply)
+        print("test2")
         print("Client Sent : ", reply)
 
         return reply
