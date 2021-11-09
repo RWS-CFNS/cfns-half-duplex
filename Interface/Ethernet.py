@@ -41,15 +41,16 @@ class Ethernet:
 
     def write_socket(self, confirmation_dict):
         max_msg_length = 10 # The value is the amount of bytes the first message will be
-
+        print("test1")
         buffer = json.dumps(confirmation_dict)
         self.sock.send(pad_msg_length(max_msg_length, len(buffer)))
         self.sock.send(buffer.encode())
         
         reply_length = self.sock.recv(max_msg_length).decode()
         reply = self.sock.recv(int(reply_length)).decode()
+        print("test2")
         reply = json.loads(reply)
-
+        print("test3")
         print("Client Sent : ", reply)
 
         return reply

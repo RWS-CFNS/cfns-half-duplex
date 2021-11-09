@@ -88,27 +88,21 @@ class Monitor(PatternMatchingEventHandler):
                     d.ethernet.init_socket(d.ethernet.ip_address, d.ethernet.socket_port)
                     d.ethernet.connect_socket()
                     data["technology"] = d.get_technology()
-                    print("test1")
                     reply = d.ethernet.write_socket(data)
-                    print("test1")
                     d.ethernet.close_socket()
 
                     if not reply.get("reply") == None:
-                        print("test2")
                         # Update the file to SKIP when confirmed is false. If confirmed is true update file.confirmed to CONFIRMED and file is found
                         new_status = Status.CONFIRMED if reply.get("reply") else Status.SKIP
                         self.folder.update_confirmed_in_file(data.get("dab_id"), status=new_status)
                     else:
-                        print("test3")
                         # If the program jumps here then the confirmation succeeded, so change the status to confirmed if the dab_id match otherwise change the data["dab_id"] to Status.SKIP
                         new_status = Status.CONFIRMED if data.get("dab_id") == reply["ack_information"][0] else Status.SKIP
                         self.folder.update_confirmed_in_file(data.get("dab_id"), status=new_status, valid=reply["ack_information"][1])
-                        
-                        print("test4")
+
                         for entry in reply.get("AIS_ack_information"):
                             self.folder.update_confirmed_in_file(entry[0], status=Status.CONFIRMED, valid=entry[1])
 
-                        print("test5")
                         for entry in reply.get("invalid_dab_confirmations"):
                             self.folder.update_confirmed_in_file(entry[0], valid=entry[1])
 
