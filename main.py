@@ -28,7 +28,7 @@ class Monitor(PatternMatchingEventHandler):
             "dab_id": dab_id,
             "message_type": message_type,
             "dab_msg_arrived_at": time_of_arrival,
-            "sender": "rpi1" # Temporary not implemented yet
+            "sender": "rpi1", # Temporary not implemented yet
         }
 
     def on_created(self, event):
@@ -88,6 +88,7 @@ class Monitor(PatternMatchingEventHandler):
                     d.ethernet.init_socket(d.ethernet.ip_address, d.ethernet.socket_port)
                     d.ethernet.connect_socket()
                     data["technology"] = d.get_technology()
+                    print("test1")
                     reply = d.ethernet.write_socket(data)
                     print("test1")
                     d.ethernet.close_socket()
