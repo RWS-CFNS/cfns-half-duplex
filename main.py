@@ -62,7 +62,7 @@ class Monitor(PatternMatchingEventHandler):
         for d in self.devices:
             if d.interface_type == 0:
                 try:
-                    if message_type == 4:
+                    if data.get("message_type") == 4:
                         msg = '  ACK:' + str(data.get("dab_id")) + ',MSG:' + str(data.get("message_type")) + ',RSSI:' + str(data.get("dab_signal")) + ',SNR:-1'
                         aisBits = BitVector.BitVector(textstring=msg)
                         payloadStr, pad = binary.bitvectoais6(aisBits)  # [0]
