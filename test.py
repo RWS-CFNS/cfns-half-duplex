@@ -223,7 +223,7 @@ class WifiConfirmTester(unittest.TestCase):
 def main():
     tester = WifiConfirmTester()
 
-    test_name = input("Welke test wilt u uitvoeren")
+    test_name = input("Welke test wilt u uitvoeren? ")
     test_suite = get_test_suite(test_name, tester)
 
     unittest.TextTestRunner().run(test_suite)
