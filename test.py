@@ -243,6 +243,8 @@ def get_test_suite(test_name, tester_class):
     function_names = get_function_names_startwith_test(tester_class)
 
     suite = unittest.TestSuite()
+    print(function_names)
+    print(test_name)
     if test_name in function_names:
         suite.addTest(tester_class.__class__(test_name))
     else:
