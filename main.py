@@ -8,10 +8,10 @@ from aisutils import nmea
 from aisutils import BitVector
 from aisutils import binary
 
-from Device import Device
-from Folder import Folder
-from File import File
-from Status import Status
+import Device
+import Folder
+import File
+import Status
 from datetime import datetime
 import time
 
@@ -47,7 +47,7 @@ class Monitor(PatternMatchingEventHandler):
         time.sleep(1)
 
         # Save new DAB+ message as File object
-        new_file = File(str(event.src_path).replace(self.folder.path, ""))
+        new_file = File.File(str(event.src_path).replace(self.folder.path, ""))
 
         # Add new DAB+ message to the Folder object
         self.folder.files.append(new_file)
@@ -101,15 +101,15 @@ class Monitor(PatternMatchingEventHandler):
 
                     if not reply.get("reply") == None:
                         # Update the file to SKIP when confirmed is false. If confirmed is true update file.confirmed to CONFIRMED and file is found
-                        new_status = Status.CONFIRMED if reply.get("reply") else Status.SKIP
+                        new_status = Status.Status.CONFIRMED if reply.get("reply") else Status.Status.SKIP
                         self.folder.update_confirmed_in_file(data.get("dab_id"), status=new_status)
                     else:
                         # If the program jumps here then the confirmation succeeded, so change the status to confirmed if the dab_id match otherwise change the data["dab_id"] to Status.SKIP
-                        new_status = Status.CONFIRMED if data.get("dab_id") == reply["ack_information"][0] else Status.SKIP
+                        new_status = Status.Status.CONFIRMED if data.get("dab_id") == reply["ack_information"][0] else Status.Status.SKIP
                         self.folder.update_confirmed_in_file(data.get("dab_id"), status=new_status, valid=reply["ack_information"][1])
 
                         for entry in reply.get("AIS_ack_information"):
-                            self.folder.update_confirmed_in_file(entry[0], status=Status.CONFIRMED, valid=entry[1])
+                            self.folder.update_confirmed_in_file(entry[0], status=Status.Status.CONFIRMED, valid=entry[1])
 
                         for entry in reply.get("invalid_dab_confirmations"):
                             self.folder.update_confirmed_in_file(entry[0], valid=entry[1])
@@ -140,7 +140,7 @@ def execute():
     args = parser.parse_args()
 
     # Create Folder object with path of folder
-    dab_folder = Folder(os.path.expanduser(args.folder))
+    dab_folder = Folder.Folder(os.path.expanduser(args.folder))
 
     # Assign folder to be monitored
     event_handler = Monitor(dab_folder)
@@ -177,7 +177,7 @@ def attach_devices(csv_parameter):
                     print(f'Column names are {", ".join(row)}')
                     line_count += 1
                     
-                device = Device(row["name"], row["branch"], row["model"], int(row["interface_type"]), row["technology"])
+                device = Device.Device(row["name"], row["branch"], row["model"], int(row["interface_type"]), row["technology"])
                 if int(row["interface_type"]) == 0:
                     print(row["name"])
                     device.rs232.init_serial(row["address"], int(row["setting"]))
