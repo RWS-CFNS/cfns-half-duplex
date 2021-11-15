@@ -23,10 +23,6 @@ from .I2C import I2C
 from .Ethernet import Ethernet
 from .UART import UART
 from .SPI import SPI
-from main import new_print
-
-old_print = print
-print = new_print
 
 class Interface:
     def __init__(self, interface_type):
