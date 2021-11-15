@@ -232,7 +232,7 @@ def get_function_names_startwith_test(_class):
     import types
 
     functionNames = []
-    for entry in _class.__dict__:
+    for entry in _class.__class__.__dict__:
         print(entry)
         value = _class.__dict__[entry]
         if (isinstance(value, types.FunctionType)):
