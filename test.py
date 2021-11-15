@@ -233,6 +233,7 @@ def get_function_names_startwith_test(_class):
 
     functionNames = []
     for entry in _class.__dict__:
+        print(entry)
         value = _class.__dict__[entry]
         if (isinstance(value, types.FunctionType)):
             functionNames.append(entry)
