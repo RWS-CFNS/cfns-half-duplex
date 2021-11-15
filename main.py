@@ -12,6 +12,7 @@ import Device
 import Folder
 import File
 import Status
+import SenderID
 from datetime import datetime
 import time
 
@@ -32,11 +33,13 @@ class Monitor(PatternMatchingEventHandler):
         self.devices = []
 
     def create_confirmation_dict(self, dab_id, message_type, time_of_arrival):
+        SenderID.SenderID().store_ID()
+        
         return {
             "dab_id": dab_id,
             "message_type": message_type,
             "dab_msg_arrived_at": time_of_arrival,
-            "sender": "rpi1", # Temporary not implemented yet
+            "sender": SenderID.SenderID().read_ID()
         }
 
     def on_created(self, event):
@@ -208,6 +211,8 @@ def attach_devices(csv_parameter):
             sys.exit()
     except RuntimeError:
         print("Could not open list with devices")
+
+
 
 
 if __name__ == "__main__":
