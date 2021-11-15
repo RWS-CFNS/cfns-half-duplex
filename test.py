@@ -226,7 +226,7 @@ def main():
     test_name = input("Welke test wilt u uitvoeren? ")
     test_suite = get_test_suite(test_name, tester)
 
-    unittest.TextTestRunner().run(test_suite)
+    unittest.TextTestRunner(verbosity=2).run(test_suite)
 
 """
     This function loops through all the attributes of get_function_names_startwith_test if the attribute is a function of _class append the function_name to function_names.
@@ -246,8 +246,6 @@ def get_test_suite(test_name, tester_class):
     function_names = get_function_names_startwith_test(tester_class)
 
     suite = unittest.TestSuite()
-    print(function_names)
-    print(test_name)
     if test_name in function_names:
         suite.addTest(tester_class.__class__(test_name))
     else:
