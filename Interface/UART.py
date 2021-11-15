@@ -21,10 +21,6 @@
 
 import serial
 from serial import Serial
-import main
-
-old_print = print
-print = main.new_print
 
 class UART:
     def __init__(self):

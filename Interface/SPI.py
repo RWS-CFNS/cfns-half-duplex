@@ -20,10 +20,7 @@
 #
 
 import spidev
-import main
 
-old_print = print
-print = main.new_print
 
 class SPI:
     def __init__(self):

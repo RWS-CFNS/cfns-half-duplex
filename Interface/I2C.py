@@ -20,10 +20,6 @@
 #
 
 from smbus2 import SMBus, i2c_msg
-import main
-
-old_print = print
-print = main.new_print
 
 class I2C:
     def __init__(self):

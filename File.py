@@ -19,11 +19,7 @@
 #    along with cfns-half-duplex. If not, see <https://www.gnu.org/licenses/>.
 #
 
-from Status import Status
-import main
-
-old_print = print
-print = main.new_print
+import Status
 
 class File:
     def __init__(self, filename):
@@ -31,7 +27,7 @@ class File:
         self.lines = []
         self.dab_id = 0
         self.message_type = 0
-        self.status = Status.UNCONFIRMED 
+        self.status = Status.Status.UNCONFIRMED 
         self.valid = True
 
     def set_lines(self, path):
