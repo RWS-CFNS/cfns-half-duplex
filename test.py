@@ -185,7 +185,7 @@ class WifiConfirmTester(unittest.TestCase):
         # Prepare the monitor
         test_folder = Folder("./correct")
         test_monitor = Monitor(test_folder)
-        test_monitor.devices = attach_devices() 
+        test_monitor.devices = attach_devices("devices.csv") 
 
         # Fill the folder with test files 
         test_file1 = File("test1")
@@ -197,7 +197,7 @@ class WifiConfirmTester(unittest.TestCase):
         test_file3 = File("test3")
         test_file3.dab_id = 6
         test_file3.message_type = 1
-        test_monitor.folder.files[test_file1, test_file2, test_file3]
+        test_monitor.folder.files = [test_file1, test_file2, test_file3]
 
         # Create the data to send
         time_of_arrival = time.time()
