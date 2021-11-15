@@ -165,7 +165,7 @@ class WifiConfirmTester(unittest.TestCase):
         # Prepare the test
         test_folder = Folder("./correct")
         test_file = File("test")
-        test_folder.files[test_file]
+        test_folder.files = [test_file]
 
         # Test if a folder can update the valid field in a file 
         expected_result = False
