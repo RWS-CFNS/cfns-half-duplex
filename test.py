@@ -228,13 +228,15 @@ def main():
 
     unittest.TextTestRunner().run(test_suite)
 
+"""
+    This function loops through all the attributes of get_function_names_startwith_test if the attribute is a function of _class append the function_name to function_names.
+    After that filter the function names that start with "test". now you have a list of the function names that start with "test" and belong to _class.
+"""
 def get_function_names_startwith_test(_class):
     import types
 
     functionNames = []
-    for entry in _class.__class__.__dict__:
-        print(entry)
-        value = _class.__dict__[entry]
+    for entry, value in _class.__class__.__dict__.items():
         if (isinstance(value, types.FunctionType)):
             functionNames.append(entry)
     
