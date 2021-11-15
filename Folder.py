@@ -19,10 +19,14 @@
 #    along with cfns-half-duplex. If not, see <https://www.gnu.org/licenses/>.
 #
 
-import main
-
+from datetime import datetime
+# Changing print to a print with the time in front
 old_print = print
-print = main.new_print
+
+def new_print(*args, **kwargs):
+    old_print(datetime.now().strftime("%H:%M:%S |"), *args, **kwargs)
+
+print = new_print
 
 class Folder:
     def __init__(self, path):
