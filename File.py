@@ -20,6 +20,10 @@
 #
 
 from Status import Status
+from main import new_print
+
+old_print = print
+print = new_print
 
 class File:
     def __init__(self, filename):

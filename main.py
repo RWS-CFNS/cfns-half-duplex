@@ -12,8 +12,16 @@ from Device import Device
 from Folder import Folder
 from File import File
 from Status import Status
+from datetime import datetime
 import time
 
+# Changing print to a print with the time in front
+old_print = print
+
+def new_print(*args, **kwargs):
+    old_print(datetime.now().strftime("%H:%M:%S |"), *args, **kwargs)
+
+print = new_print
 
 class Monitor(PatternMatchingEventHandler):
 

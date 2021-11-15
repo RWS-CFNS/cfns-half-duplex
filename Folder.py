@@ -19,6 +19,11 @@
 #    along with cfns-half-duplex. If not, see <https://www.gnu.org/licenses/>.
 #
 
+from main import new_print
+
+old_print = print
+print = new_print
+
 class Folder:
     def __init__(self, path):
         self.path = path

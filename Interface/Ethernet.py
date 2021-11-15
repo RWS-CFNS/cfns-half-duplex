@@ -1,5 +1,9 @@
 import socket
 import json
+from main import new_print
+
+old_print = print
+print = new_print
 
 """
     pad the var msg_length to the padding size. 

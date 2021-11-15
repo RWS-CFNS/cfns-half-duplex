@@ -1,6 +1,9 @@
 #!/usr/bin/python
 from Interface.Interface import Interface
+from main import new_print
 
+old_print = print
+print = new_print
 
 class Device(Interface):
     def __init__(self, name, branch, model, interface_type, technology):
