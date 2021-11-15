@@ -1,14 +1,5 @@
 import socket
 import json
-from datetime import datetime
-
-# Changing print to a print with the time in front
-old_print = print
-
-def new_print(*args, **kwargs):
-    old_print(datetime.now().strftime("%H:%M:%S |"), *args, **kwargs)
-
-print = new_print
 
 """
     pad the var msg_length to the padding size. 
