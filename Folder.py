@@ -19,10 +19,10 @@
 #    along with cfns-half-duplex. If not, see <https://www.gnu.org/licenses/>.
 #
 
-import main
+from main import new_print
 
 old_print = print
-print = main.new_print
+print = new_print
 
 class Folder:
     def __init__(self, path):
