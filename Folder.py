@@ -41,6 +41,10 @@ class Folder:
                 continue
         return False
 
+    """
+        This method takes in keyword arguments and a dab_id. The dab_id is used to find the file this method has to update.
+        The kwargs are used to specify wich fields need to be changed to a different value.
+    """
     def update_confirmed_in_file(self, dab_id, **kwargs):
         file = self.find_file_by_dab_id(dab_id)
 

@@ -40,6 +40,7 @@ class File:
         self.message_type = int(self.lines[1])
 
     def set_status(self, status):
+        # Change status if the new status is of type Status
         if type(status) == type(self.status):
             self.status = status
 

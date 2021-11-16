@@ -1,6 +1,10 @@
 import uuid
 import os
 
+"""
+    A Class to generate, store and retrieve an SenderID. This way even if the program shuts down or crashes
+    the SenderID stays the same
+"""
 class SenderID:
     def __init__(self):
         self.filename = "id.txt"

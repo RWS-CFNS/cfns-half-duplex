@@ -39,6 +39,10 @@ class Ethernet:
     def close_socket(self):
         self.sock.close()
 
+    """
+        This method is used to send the confirmation_dict using the socket connection of this class.
+        The method is also responsible for retrieving the reply message.
+    """
     def write_socket(self, confirmation_dict):
         max_msg_length = 10 # The value is the amount of bytes the first message will be
         buffer = json.dumps(confirmation_dict)
