@@ -24,7 +24,6 @@ from .Ethernet import Ethernet
 from .UART import UART
 from .SPI import SPI
 
-
 class Interface:
     def __init__(self, interface_type):
 

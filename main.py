@@ -8,12 +8,12 @@ from aisutils import nmea
 from aisutils import BitVector
 from aisutils import binary
 
-
-from Device import Device
-from Folder import Folder
-from File import File
+import Device
+import Folder
+import File
+import Status
+import SenderID
 import time
-
 
 class Monitor(PatternMatchingEventHandler):
 
@@ -23,12 +23,25 @@ class Monitor(PatternMatchingEventHandler):
         self.folder = folder
         self.devices = []
 
+    def create_confirmation_dict(self, dab_id, message_type, time_of_arrival):
+        SenderID.SenderID().store_ID()
+        
+        return {
+            "dab_id": dab_id,
+            "message_type": message_type,
+            "dab_msg_arrived_at": time_of_arrival,
+            "sender": SenderID.SenderID().read_ID()
+        }
+
     def on_created(self, event):
+        # This var keeps track of the time of arrival of a dab message
+        time_of_arrival = time.time()
+
         print(event.src_path, event.event_type)
         time.sleep(1)
 
         # Save new DAB+ message as File object
-        new_file = File(str(event.src_path).replace(self.folder.path, ""))
+        new_file = File.File(str(event.src_path).replace(self.folder.path, ""))
 
         # Add new DAB+ message to the Folder object
         self.folder.files.append(new_file)
@@ -41,54 +54,73 @@ class Monitor(PatternMatchingEventHandler):
         for line in new_file.get_lines():
             print(f'line: {line}')
 
-        data = []
+        data = self.create_confirmation_dict(dab_id, message_type, time_of_arrival)
         if message_type == 4:
-            data.append(get_dab_signal())
-        self.acknowledge(dab_id, message_type, data)
+            data["dab_signal"] = get_dab_signal()
 
-    def acknowledge(self, dab_id, message_type, data):
+        self.acknowledge(data)
+
+    def acknowledge(self, data):
         for d in self.devices:
             if d.interface_type == 0:
                 try:
-                    if message_type == 4:
-                        msg = '  ACK:' + str(dab_id) + ',MSG:' + str(message_type) + ',RSSI:' + str(data[0]) + ',SNR:-1'
+                    if data.get("message_type") == 4:
+                        msg = '  ACK:' + str(data.get("dab_id")) + ',MSG:' + str(data.get("message_type")) + ',RSSI:' + str(data.get("dab_signal")) + ',SNR:-1'
                         aisBits = BitVector.BitVector(textstring=msg)
                         payloadStr, pad = binary.bitvectoais6(aisBits)  # [0]
                         buffer = nmea.bbmEncode(1, 1, 0, 1, 8, payloadStr, pad, appendEOL=False)
                         d.rs232.write_rs232(buffer)
                     else:
-                        msg = '  ACK:' + str(dab_id) + ',MSG:' + str(message_type) + ''
+                        msg = '  ACK:' + str(data.get("dab_id")) + ',MSG:' + str(data.get("message_type")) + ''
                         aisBits = BitVector.BitVector(textstring=msg)
                         payloadStr, pad = binary.bitvectoais6(aisBits)  # [0]
                         buffer = nmea.bbmEncode(1, 1, 0, 1, 8, payloadStr, pad, appendEOL=False)
                         d.rs232.write_rs232(buffer)
-
-                except ("There is no connection with: %s" % d.name):
+                except:
+                    print("There is no connection with: %s" % d.name)
                     print("Could not send with: %s" % d.name)
-                    pass
             elif d.interface_type == 1:
                 try:
-                    d.i2c.write_i2c(dab_id, message_type, data)
-                except ("There is no connection with: %s" % d.name):
+                    d.i2c.write_i2c(data)
+                except:
+                    print("There is no connection with: %s" % d.name)
                     print("Could not send with: %s" % d.name)
-                    pass
             elif d.interface_type == 2:
                 try:
                     d.ethernet.init_socket(d.ethernet.ip_address, d.ethernet.socket_port)
                     d.ethernet.connect_socket()
-                    d.ethernet.write_socket([dab_id, message_type, d.get_technology()])
+                    data["technology"] = d.get_technology()
+                    reply = d.ethernet.write_socket(data)
                     d.ethernet.close_socket()
-                except ("There is no connection with: %s" % d.name):
-                    print("Could not send with: %s" % d.name)
 
-                    pass
+                    if not reply.get("reply") == None:
+                        # Update the file to SKIP when confirmed is false. If confirmed is true update file.confirmed to CONFIRMED and file is found
+                        new_status = Status.Status.CONFIRMED if reply.get("reply") else Status.Status.SKIP
+                        self.folder.update_confirmed_in_file(data.get("dab_id"), status=new_status)
+                    else:
+                        # If the program jumps here then the confirmation succeeded, so change the status to confirmed if the dab_id match otherwise change the data["dab_id"] to Status.SKIP
+                        new_status = Status.Status.CONFIRMED if data.get("dab_id") == reply["ack_information"][0] else Status.Status.SKIP
+                        self.folder.update_confirmed_in_file(data.get("dab_id"), status=new_status, valid=reply["ack_information"][1])
+
+                        for entry in reply.get("AIS_ack_information"):
+                            self.folder.update_confirmed_in_file(entry[0], status=Status.Status.CONFIRMED, valid=entry[1])
+
+                        for entry in reply.get("invalid_dab_confirmations"):
+                            self.folder.update_confirmed_in_file(entry[0], valid=entry[1])
+
+                    # print the status for every file
+                    for file in self.folder.files:
+                        print(file.get_status())
+                except Exception as e:
+                    print(e)
+                    print("There is no connection with: %s" % d.name)
+                    print("Could not send with: %s" % d.name)
             elif d.interface_type == 3:
                 try:
-                    d.spi.write_spi(dab_id, message_type)
-                except ("There is no connection with: %s" % d.name):
+                    d.spi.write_spi(data.get("dab_id"), data.get("message_type"))
+                except:
+                    print("There is no connection with: %s" % d.name)
                     print("Could not send with: %s" % d.name)
-                    pass
-
 
 def execute():
     # create parser
@@ -102,7 +134,7 @@ def execute():
     args = parser.parse_args()
 
     # Create Folder object with path of folder
-    dab_folder = Folder(os.path.expanduser(args.folder))
+    dab_folder = Folder.Folder(os.path.expanduser(args.folder))
 
     # Assign folder to be monitored
     event_handler = Monitor(dab_folder)
@@ -139,7 +171,7 @@ def attach_devices(csv_parameter):
                     print(f'Column names are {", ".join(row)}')
                     line_count += 1
                     
-                device = Device(row["name"], row["branch"], row["model"], int(row["interface_type"]), row["technology"])
+                device = Device.Device(row["name"], row["branch"], row["model"], int(row["interface_type"]), row["technology"])
                 if int(row["interface_type"]) == 0:
                     print(row["name"])
                     device.rs232.init_serial(row["address"], int(row["setting"]))
@@ -170,6 +202,8 @@ def attach_devices(csv_parameter):
             sys.exit()
     except RuntimeError:
         print("Could not open list with devices")
+
+
 
 
 if __name__ == "__main__":

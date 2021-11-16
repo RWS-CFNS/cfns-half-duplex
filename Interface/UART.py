@@ -22,7 +22,6 @@
 import serial
 from serial import Serial
 
-
 class UART:
     def __init__(self):
         self.port = ""

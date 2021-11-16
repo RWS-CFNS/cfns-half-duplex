@@ -33,6 +33,32 @@ class Folder:
     def get_list_files(self):
         return self.files
 
+    def find_file_by_dab_id(self, dab_id):
+        for file in self.files:
+            if file.dab_id == dab_id:
+                return file
+            else:
+                continue
+        return False
+
+    """
+        This method takes in keyword arguments and a dab_id. The dab_id is used to find the file this method has to update.
+        The kwargs are used to specify wich fields need to be changed to a different value.
+    """
+    def update_confirmed_in_file(self, dab_id, **kwargs):
+        file = self.find_file_by_dab_id(dab_id)
+
+        if not file:
+            print("File not found")
+            return 
+
+        for field_in_file, value in kwargs.items():
+            if field_in_file == "status":
+                file.set_status(value)
+            elif field_in_file == "valid":
+                file.set_valid(value)
+
+        
     # def set_list_files(self):
     #     files = []
     #     for x in os.listdir(self.path):

@@ -1,7 +1,6 @@
 #!/usr/bin/python
 from Interface.Interface import Interface
 
-
 class Device(Interface):
     def __init__(self, name, branch, model, interface_type, technology):
         super().__init__(interface_type)
