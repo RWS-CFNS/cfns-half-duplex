@@ -51,7 +51,7 @@ class Ethernet:
         
         reply_length = self.sock.recv(max_msg_length).decode()
         reply = self.sock.recv(int(reply_length)).decode()
-        reply = reply.replace("'", '"')
+        reply = reply.replace("'", '"') # Change from single quotes to double quotes otherwise loads crashes
         reply = json.loads(reply)
         print("Client Sent : ", reply)
 
