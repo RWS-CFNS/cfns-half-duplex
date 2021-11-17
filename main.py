@@ -191,7 +191,7 @@ def attach_devices(csv_parameter):
                     line_count += 1
                     
                 device = Device(row["name"], row["branch"], row["model"], int(row["interface_type"]), row["technology"], int(row["priority"]))
-                print(device.interface)
+                print(row)
                 if int(row["interface_type"]) == 0:
                     print(row["name"])
                     device.interface.init_serial(row["address"], int(row["setting"]))
