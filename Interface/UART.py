@@ -19,8 +19,8 @@
 #    along with cfns-half-duplex. If not, see <https://www.gnu.org/licenses/>.
 #
 
-import serial
-from serial import Serial
+import serial # type: ignore this line 
+from serial import Serial # type: ignore this line
 
 class UART:
     def __init__(self):
@@ -60,7 +60,7 @@ class UART:
         self.ser.close()
         return self.ser.isOpen()
 
-    def write_rs232(self, msg):
+    def write(self, msg):
         try:
             self.ser.write(str(msg).encode("utf-8"))  # "!AIBBM,1,1,0,2,8,04a9M>1@PU>0U>06185=08E99V1@E=4,0*7C"
             print("UART data send for acknowledgement: ", msg)

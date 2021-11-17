@@ -19,7 +19,7 @@
 #    along with cfns-half-duplex. If not, see <https://www.gnu.org/licenses/>.
 #
 
-import spidev
+import spidev # type: ignore this line
 
 
 class SPI:
@@ -51,7 +51,7 @@ class SPI:
     def close_spi(self):
         self.spi.close()
 
-    def write_spi(self, data, type):
+    def write(self, data, type):
         # Write a single byte to address 80
         buff = []
         buff.append(data)

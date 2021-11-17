@@ -43,12 +43,13 @@ class Ethernet:
         This method is used to send the confirmation_dict using the socket connection of this class.
         The method is also responsible for retrieving the reply message.
     """
-    def write_socket(self, confirmation_dict):
-        max_msg_length = 10 # The value is the amount of bytes the first message will be
+    def write(self, confirmation_dict, max_msg_length):
         buffer = json.dumps(confirmation_dict)
         self.sock.send(pad_msg_length(max_msg_length, len(buffer)))
         self.sock.send(buffer.encode())
-        
+    
+
+    def read_socket(self, max_msg_length):
         reply_length = self.sock.recv(max_msg_length).decode()
         reply = self.sock.recv(int(reply_length)).decode()
         reply = reply.replace("'", '"') # Change from single quotes to double quotes otherwise loads crashes
@@ -56,7 +57,3 @@ class Ethernet:
         print("Client Sent : ", reply)
 
         return reply
-
-    def read_socket(self):
-        data, addr = self.sock.recvfrom(4096)
-        return data, addr

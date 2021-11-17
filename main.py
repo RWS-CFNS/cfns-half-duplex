@@ -4,18 +4,16 @@ import argparse
 import csv
 from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler
-from aisutils import nmea
-from aisutils import BitVector
-from aisutils import binary
 
-import Device
-import Folder
-import File
-import Status
-import SenderID
+from Devices.Device import Device
+from Folder import Folder
+from File import File
+from Status import Status
+from SenderID import SenderID
 import time
 
 class Monitor(PatternMatchingEventHandler):
+    """A Class to handle incoming DAB files."""
 
     def __init__(self, folder):
         # Set the patterns for PatternMatchingEventHandler
@@ -23,16 +21,22 @@ class Monitor(PatternMatchingEventHandler):
         self.folder = folder
         self.devices = []
 
+    """
+        This method creates the confirmation dictionary
+    """
     def create_confirmation_dict(self, dab_id, message_type, time_of_arrival):
-        SenderID.SenderID().store_ID()
+        SenderID().store_ID()
         
         return {
             "dab_id": dab_id,
             "message_type": message_type,
             "dab_msg_arrived_at": time_of_arrival,
-            "sender": SenderID.SenderID().read_ID()
+            "sender": SenderID().read_ID()
         }
 
+    """
+        This method will be called when the observer detects a file being created in the folder that it observes.
+    """
     def on_created(self, event):
         # This var keeps track of the time of arrival of a dab message
         time_of_arrival = time.time()
@@ -41,7 +45,7 @@ class Monitor(PatternMatchingEventHandler):
         time.sleep(1)
 
         # Save new DAB+ message as File object
-        new_file = File.File(str(event.src_path).replace(self.folder.path, ""))
+        new_file = File(str(event.src_path).replace(self.folder.path, ""))
 
         # Add new DAB+ message to the Folder object
         self.folder.files.append(new_file)
@@ -51,77 +55,87 @@ class Monitor(PatternMatchingEventHandler):
         dab_id = new_file.get_dab_id()
         message_type = new_file.get_message_type()
 
+        # Show the contents of the file
         for line in new_file.get_lines():
             print(f'line: {line}')
 
+        # Build the confirmation dict which contains all the necessary information to acknowledge a DAB messsage
         data = self.create_confirmation_dict(dab_id, message_type, time_of_arrival)
         if message_type == 4:
             data["dab_signal"] = get_dab_signal()
+        
+        # Choose the best possible device or devices if the reach of the device can not be determined
+        devices = self.choose_device(dab_id)
 
+        # If there is no device available abort the acknowledgment
+        if not devices:
+            return
+
+        # Add the technology or technologies to the confirmation dict
+        technologies = [device.get_technology() for device in devices]
+        data["techonology"] = technologies
+
+        # Start the acknowledgment
         self.acknowledge(data)
 
-    def acknowledge(self, data):
-        for d in self.devices:
-            if d.interface_type == 0:
-                try:
-                    if data.get("message_type") == 4:
-                        msg = '  ACK:' + str(data.get("dab_id")) + ',MSG:' + str(data.get("message_type")) + ',RSSI:' + str(data.get("dab_signal")) + ',SNR:-1'
-                        aisBits = BitVector.BitVector(textstring=msg)
-                        payloadStr, pad = binary.bitvectoais6(aisBits)  # [0]
-                        buffer = nmea.bbmEncode(1, 1, 0, 1, 8, payloadStr, pad, appendEOL=False)
-                        d.rs232.write_rs232(buffer)
-                    else:
-                        msg = '  ACK:' + str(data.get("dab_id")) + ',MSG:' + str(data.get("message_type")) + ''
-                        aisBits = BitVector.BitVector(textstring=msg)
-                        payloadStr, pad = binary.bitvectoais6(aisBits)  # [0]
-                        buffer = nmea.bbmEncode(1, 1, 0, 1, 8, payloadStr, pad, appendEOL=False)
-                        d.rs232.write_rs232(buffer)
-                except:
-                    print("There is no connection with: %s" % d.name)
-                    print("Could not send with: %s" % d.name)
-            elif d.interface_type == 1:
-                try:
-                    d.i2c.write_i2c(data)
-                except:
-                    print("There is no connection with: %s" % d.name)
-                    print("Could not send with: %s" % d.name)
-            elif d.interface_type == 2:
-                try:
-                    d.ethernet.init_socket(d.ethernet.ip_address, d.ethernet.socket_port)
-                    d.ethernet.connect_socket()
-                    data["technology"] = d.get_technology()
-                    reply = d.ethernet.write_socket(data)
-                    d.ethernet.close_socket()
+    """
+        This method chooses the best device based on the reach the technology of the device has, the specifics of the used technology and the availability of the device. 
+        To choose the device that fits best for the current situation
+    """
+    def choose_device(self, dab_id):
+        # Check if devices is empty 
+        if not self.devices:
+            self.folder.update_file(dab_id, status=Status.SKIP)
+            return False
 
-                    if not reply.get("reply") == None:
-                        # Update the file to SKIP when confirmed is false. If confirmed is true update file.confirmed to CONFIRMED and file is found
-                        new_status = Status.Status.CONFIRMED if reply.get("reply") else Status.Status.SKIP
-                        self.folder.update_confirmed_in_file(data.get("dab_id"), status=new_status)
-                    else:
-                        # If the program jumps here then the confirmation succeeded, so change the status to confirmed if the dab_id match otherwise change the data["dab_id"] to Status.SKIP
-                        new_status = Status.Status.CONFIRMED if data.get("dab_id") == reply["ack_information"][0] else Status.Status.SKIP
-                        self.folder.update_confirmed_in_file(data.get("dab_id"), status=new_status, valid=reply["ack_information"][1])
+        # This are the devices that are in reach of a receiver that can receive data using their technology
+        devices_have_reach = [device for device in self.devices.copy() if device.has_reach()]
 
-                        for entry in reply.get("AIS_ack_information"):
-                            self.folder.update_confirmed_in_file(entry[0], status=Status.Status.CONFIRMED, valid=entry[1])
+        # This are the devices that can not determine if they are within reach or not
+        devices_not_able_to_calc_reach = [device for device in self.devices.copy() if device.has_reach() is None]
 
-                        for entry in reply.get("invalid_dab_confirmations"):
-                            self.folder.update_confirmed_in_file(entry[0], valid=entry[1])
+        if devices_have_reach:
+            # Find the device with the highest priority. Highest priority is the lowest device.priority value
+            return [min(devices_have_reach, key= lambda device: device.priority)]
+        elif devices_not_able_to_calc_reach:
+            # Choose all the possible devices
+            return devices_not_able_to_calc_reach
+        else:
+            self.folder.update_file(dab_id, status=Status.SKIP)     
+            return False
 
-                    # print the status for every file
-                    for file in self.folder.files:
-                        print(file.get_status())
-                except Exception as e:
-                    print(e)
-                    print("There is no connection with: %s" % d.name)
-                    print("Could not send with: %s" % d.name)
-            elif d.interface_type == 3:
-                try:
-                    d.spi.write_spi(data.get("dab_id"), data.get("message_type"))
-                except:
-                    print("There is no connection with: %s" % d.name)
-                    print("Could not send with: %s" % d.name)
+    """
+        This method is responsible for acknowledging the DAB file with all the available devices.
+    """
+    def acknowledge(self, data, devices):
+        for device in devices:
+            reply = device.acknowledge(data, device.get_interface())
 
+            if not reply:
+                # Update the file to SKIP, because the acknowledgment failed for an unkown reason
+                self.folder.update_file(data.get("dab_id"), status=Status.SKIP)
+                return
+
+            if device.get_technology() is "Wifi":
+                # Change the status to confirmed if the dab_id match otherwise change the data["dab_id"] to Status.SKIP
+                new_status = Status.CONFIRMED if data.get("dab_id") == reply["ack_information"][0] else Status.SKIP
+                self.folder.update_file(data.get("dab_id"), status=new_status, valid=reply["ack_information"][1])
+
+                for entry in reply.get("AIS_ack_information"):
+                    self.folder.update_file(entry[0], status=Status.CONFIRMED, valid=entry[1])
+
+                for entry in reply.get("invalid_dab_confirmations"):
+                    self.folder.update_file(entry[0], valid=entry[1])
+
+                # print the status for every file
+                for file in self.folder.files:
+                    print(file.get_status())
+    
+                    
+
+"""
+    This function is the main function that handles starting the monitor and observer
+"""
 def execute():
     # create parser
     parser = argparse.ArgumentParser()
@@ -134,7 +148,7 @@ def execute():
     args = parser.parse_args()
 
     # Create Folder object with path of folder
-    dab_folder = Folder.Folder(os.path.expanduser(args.folder))
+    dab_folder = Folder(os.path.expanduser(args.folder))
 
     # Assign folder to be monitored
     event_handler = Monitor(dab_folder)
@@ -143,6 +157,8 @@ def execute():
 
     # Assign list of devices attached to the system
     event_handler.devices = attach_devices(args.devices)
+
+    # Start the observing of the folder args.folder. When something changes start on_created in the event_handler
     observer.start()
     print("Monitoring started")
     try:
@@ -158,7 +174,10 @@ def execute():
 def get_dab_signal():
     return 20
 
-
+"""
+    This function reads all the device information from a csv file. Then converts that infromation to a Device object. 
+    And adds the object to the attribute devices belonging to Monitor.
+"""
 def attach_devices(csv_parameter):
     listed_devices = []
 
@@ -171,25 +190,25 @@ def attach_devices(csv_parameter):
                     print(f'Column names are {", ".join(row)}')
                     line_count += 1
                     
-                device = Device.Device(row["name"], row["branch"], row["model"], int(row["interface_type"]), row["technology"])
+                device = Device(row["name"], row["branch"], row["model"], int(row["interface_type"]), row["technology"], row["priority"])
                 if int(row["interface_type"]) == 0:
                     print(row["name"])
-                    device.rs232.init_serial(row["address"], int(row["setting"]))
+                    device.interface.init_serial(row["address"], int(row["setting"]))
                     listed_devices.append(device)
 
                 if int(row["interface_type"]) == 1:
                     print(row["name"])
-                    device.i2c.init_i2c(int(row["address"]))
+                    device.interface.init_i2c(int(row["address"]))
                     listed_devices.append(device)
 
                 if int(row["interface_type"]) == 2:
                     print(row["name"])
-                    device.ethernet.init_socket(row["address"], int(row["setting"]))
+                    device.interface.init_socket(row["address"], int(row["setting"]))
                     listed_devices.append(device)
 
                 if int(row["interface_type"]) == 3:
                     print(row["name"])
-                    device.spi.init_spi(int(row["address"]), int(row["setting"]))
+                    device.interface.init_spi(int(row["address"]), int(row["setting"]))
                     listed_devices.append(device)
                     
                 line_count += 1
@@ -202,8 +221,6 @@ def attach_devices(csv_parameter):
             sys.exit()
     except RuntimeError:
         print("Could not open list with devices")
-
-
 
 
 if __name__ == "__main__":

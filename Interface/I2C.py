@@ -47,7 +47,7 @@ class I2C:
                 print("No device connected to bus")
                 pass
 
-    def write_i2c(self, data):
+    def write(self, data):
         try:
             # Write a single byte to address 80
             buff = []

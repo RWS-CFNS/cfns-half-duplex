@@ -109,13 +109,6 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual("PU-00", new_result_model)
         self.assertEqual(1, new_result_interface)
 
-    def test_interface(self):
-        test_interface = Interface.Interface(0)
-        self.assertEqual(0, test_interface.interface_type)
-        test_interface.get_rs232_settings()
-        with self.assertRaises(AttributeError):
-            test_interface.get_ethernet_settings()
-
     def test_rs232(self):
         test_rs232 = Interface.UART()
         #test_rs232.init_serial("/dev/ttyUSB0", 115200)
