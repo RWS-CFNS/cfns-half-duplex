@@ -43,11 +43,11 @@ class Device:
         """
         if interface_type == 0:
             self.interface = UART()
-        elif self.interface_type == 1:
+        elif interface_type == 1:
             self.interface = I2C()
-        elif self.interface_type == 2:
+        elif interface_type == 2:
             self.interface = Ethernet()
-        elif self.interface_type == 3:
+        elif interface_type == 3:
             self.interface = SPI()
 
     def get_interface(self):
