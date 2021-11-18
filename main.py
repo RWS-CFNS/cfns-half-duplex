@@ -114,8 +114,9 @@ class Monitor(PatternMatchingEventHandler):
                 self.folder.update_file(data.get("dab_id"), status=Status.SKIP)
                 return
 
+            print(device.get_technology() is "Wifi", device.get_technology() == "Wifi")
             if device.get_technology() is "Wifi":
-                print("TESTING")
+                
                 # Change the status to confirmed if the dab_id match otherwise change the data["dab_id"] to Status.SKIP
                 new_status = Status.CONFIRMED if data.get("dab_id") == reply["ack_information"][0] else Status.SKIP
                 self.folder.update_file(data.get("dab_id"), status=new_status, valid=reply["ack_information"][1])
