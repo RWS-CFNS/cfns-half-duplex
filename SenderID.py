@@ -19,4 +19,4 @@ class SenderID:
 
     def read_ID(self):
         with open(self.filename, mode='r', encoding='utf-8') as file:
-            return uuid.UUID(file.readline())
+            return str(uuid.UUID(file.readline()))
