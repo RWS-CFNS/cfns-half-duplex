@@ -1,5 +1,5 @@
 #!/usr/bin/python
-from Devices.Strategy import AISStrategy, EthernetStrategy, StandardStrategy
+from Devices.Strategy import AISStrategy, EthernetStrategy, StandardStrategy, Strategy
 from Interface.I2C import I2C
 from Interface.Ethernet import Ethernet
 from Interface.UART import UART
@@ -57,13 +57,15 @@ class Device:
 
     def set_strategy_based_on_interface_type(self, interface_type):
         if interface_type == 0:
-            self.strategy = AISStrategy()
+            return AISStrategy()
         elif interface_type == 1:
-            self.strategy = StandardStrategy()
+            return StandardStrategy()
         elif interface_type == 2:
-            self.strategy = EthernetStrategy()
+            return EthernetStrategy()
         elif interface_type == 3:
-            self.strategy = StandardStrategy()
+            return StandardStrategy()
+        else:
+            return None
         
     def set_strategy(self, strategy):
         self.strategy = strategy
