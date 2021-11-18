@@ -43,7 +43,7 @@ class EthernetStrategy(Strategy):
                 interface.connect_socket() 
                 interface.write(data, max_msg_length)
                 reply = interface.read_socket(max_msg_length)
-                return reply if reply.get("reply") else False
+                return reply if reply else False
         except Exception as e:
             print(e)
             return False
