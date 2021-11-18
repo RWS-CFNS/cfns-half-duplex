@@ -109,6 +109,7 @@ class Monitor(PatternMatchingEventHandler):
             data["technology"] = device.get_technology()
             reply = device.acknowledge(data)
 
+            print(reply, not reply)
             if not reply:
                 # Update the file to SKIP, because the acknowledgment failed for an unkown reason
                 self.folder.update_file(data.get("dab_id"), status=Status.SKIP)
