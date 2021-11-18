@@ -106,7 +106,7 @@ class Monitor(PatternMatchingEventHandler):
     def acknowledge(self, data, devices):
         for device in devices:
             # Add the technology to the confirmation dict
-            data["techonology"] = device.get_technology()
+            data["technology"] = device.get_technology()
             reply = device.acknowledge(data)
 
             if not reply:
