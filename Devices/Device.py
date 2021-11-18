@@ -33,7 +33,8 @@ class Device:
         if self.technology is "AIS":
             return None
         
-        if isinstance(self.interface, EthernetStrategy):
+        print(self.strategy, isinstance(self.strategy, EthernetStrategy))
+        if isinstance(self.strategy, EthernetStrategy):
             data = {"has_reach": self.technology} # A dict to ask the fipy if the technology has_reach
 
             reply = self.strategy.communicate(data, self.interface)
@@ -46,7 +47,7 @@ class Device:
             else:
                 # reply.get("has_reach") can only be True, False or None. So here it is None. Therefor return None
                 return None
-        elif isinstance(self.interface, StandardStrategy):
+        elif isinstance(self.strategy, StandardStrategy):
             # Don't no what kind of device uses StandardStrategy. Therefore it is not possible to determine has_reach. So return False to skip using this device
             print("Not known what device uses the StandardStrategy")
             return False
