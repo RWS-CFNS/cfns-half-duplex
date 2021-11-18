@@ -109,13 +109,13 @@ class Monitor(PatternMatchingEventHandler):
             data["technology"] = device.get_technology()
             reply = device.acknowledge(data)
 
-            print(reply, not reply)
             if not reply:
                 # Update the file to SKIP, because the acknowledgment failed for an unkown reason
                 self.folder.update_file(data.get("dab_id"), status=Status.SKIP)
                 return
-            print(device.get_technology())
+
             if device.get_technology() is "Wifi":
+                print("TESTING")
                 # Change the status to confirmed if the dab_id match otherwise change the data["dab_id"] to Status.SKIP
                 new_status = Status.CONFIRMED if data.get("dab_id") == reply["ack_information"][0] else Status.SKIP
                 self.folder.update_file(data.get("dab_id"), status=new_status, valid=reply["ack_information"][1])
