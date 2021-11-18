@@ -19,7 +19,7 @@
 #    along with cfns-half-duplex. If not, see <https://www.gnu.org/licenses/>.
 #
 
-from smbus2 import SMBus, i2c_msg
+from smbus2 import SMBus, i2c_msg # type: ignore this line
 
 class I2C:
     def __init__(self):

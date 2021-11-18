@@ -6,11 +6,11 @@ from abc import ABC, abstractmethod
 
 class Strategy(ABC):
     @abstractmethod
-    def acknowledge(self, data, interface):
+    def communicate(self, data, interface):
         """Subclasses need to implement this method."""
 
 class StandardStrategy(Strategy):
-    def acknowledge(self, data, interface):
+    def communicate(self, data, interface):
         try:
             interface.write(data)
         except Exception as e:
@@ -18,7 +18,7 @@ class StandardStrategy(Strategy):
             return False
 
 class AISStrategy(Strategy):
-    def acknowledge(self, data, interface):
+    def communicate(self, data, interface):
         try:
             if data.get("message_type") == 4:
                 msg = '  ACK:' + str(data.get("dab_id")) + ',MSG:' + str(data.get("message_type")) + ',RSSI:' + str(data.get("dab_signal")) + ',SNR:-1'
@@ -34,7 +34,7 @@ class AISStrategy(Strategy):
             return False
 
 class EthernetStrategy(Strategy):
-    def acknowledge(self, data, interface):
+    def communicate(self, data, interface):
         try:
             max_msg_length = 10 # The value is the amount of bytes the first message will be
 

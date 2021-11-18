@@ -69,23 +69,19 @@ class Monitor(PatternMatchingEventHandler):
 
         # If there is no device available abort the acknowledgment
         if not devices:
+            self.folder.update_file(dab_id, status=Status.SKIP)
             return
 
-        # Add the technology or technologies to the confirmation dict
-        technologies = [device.get_technology() for device in devices]
-        data["techonology"] = technologies
-
         # Start the acknowledgment
-        self.acknowledge(data)
+        self.acknowledge(data, devices)
 
     """
         This method chooses the best device based on the reach the technology of the device has, the specifics of the used technology and the availability of the device. 
         To choose the device that fits best for the current situation
     """
-    def choose_device(self, dab_id):
+    def choose_device(self):
         # Check if devices is empty 
         if not self.devices:
-            self.folder.update_file(dab_id, status=Status.SKIP)
             return False
 
         # This are the devices that are in reach of a receiver that can receive data using their technology
@@ -100,8 +96,8 @@ class Monitor(PatternMatchingEventHandler):
         elif devices_not_able_to_calc_reach:
             # Choose all the possible devices
             return devices_not_able_to_calc_reach
-        else:
-            self.folder.update_file(dab_id, status=Status.SKIP)     
+        else: 
+            # If there is no device within reach or no device in devices_not_able_to_calc_reach. return False
             return False
 
     """
@@ -109,7 +105,9 @@ class Monitor(PatternMatchingEventHandler):
     """
     def acknowledge(self, data, devices):
         for device in devices:
-            reply = device.acknowledge(data, device.get_interface())
+            # Add the technology to the confirmation dict
+            data["techonology"] = device.get_technology()
+            reply = device.acknowledge(data)
 
             if not reply:
                 # Update the file to SKIP, because the acknowledgment failed for an unkown reason
@@ -130,8 +128,15 @@ class Monitor(PatternMatchingEventHandler):
                 # print the status for every file
                 for file in self.folder.files:
                     print(file.get_status())
-    
-                    
+            elif device.get_technology() is "LoRaWAN":
+                # TODO
+                ...
+            elif device.get_technology() is "LTE":
+                # TODO
+                ...
+            else:
+                # TODO wat als het AIS, VDES...
+                ...        
 
 """
     This function is the main function that handles starting the monitor and observer

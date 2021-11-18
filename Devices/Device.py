@@ -6,6 +6,8 @@ from Interface.UART import UART
 from Interface.SPI import SPI
 
 class Device:
+    """A Class to represent the device that is responsible for acknowledging a message."""
+
     def __init__(self, name, branch, model, interface_type, technology, priority):
         self.interface = self.set_interface(interface_type)
         self.name = name
@@ -15,6 +17,43 @@ class Device:
         self.priority = priority
         self.strategy = self.set_strategy_based_on_interface_type(interface_type)
     
+    """
+        This method is used to acknowledge a message using this device. 
+        The method uses the strategy that belongs to the interface used by the device
+    """
+    def acknowledge(self, data):
+        return self.strategy.communicate(data, self.interface)
+
+    """
+        This method tries to determine if the device connected this object is within reach of a receiver.
+        Is implemented for devices using AIS or Ethernet as Interface
+    """
+    def has_reach(self):
+        # If the technology cannot confirm that there is a receiver in reach. Return None
+        if self.technology is "AIS":
+            return None
+        
+        if isinstance(self.interface, EthernetStrategy):
+            data = {"has_reach": self.technology} # A dict to ask the fipy if the technology has_reach
+
+            reply = self.strategy.communicate(data, self.interface)
+            
+            if reply.get("reply") is True:
+                return True
+            elif reply.get("reply") is False:
+                # reply is False if has_reach failes due to the reach of the technology or an error occuring
+                return False
+            else:
+                # reply.get("has_reach") can only be True, False or None. So here it is None. Therefor return None
+                return None
+        elif isinstance(self.interface, StandardStrategy):
+            # Don't no what kind of device uses StandardStrategy. Therefore it is not possible to determine has_reach. So return False to skip using this device
+            print("Not known what device uses the StandardStrategy")
+            return False
+        else:
+            print("Interface is not set up correctly")
+            return False
+
     def set_strategy_based_on_interface_type(self, interface_type):
         if interface_type == 0:
             self.strategy = AISStrategy()
