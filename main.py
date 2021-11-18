@@ -52,8 +52,8 @@ class Monitor(PatternMatchingEventHandler):
         message_type = new_file.get_message_type()
 
         # Check if File is already in folder. If so abort the confirmation and do not store the file.
-        if self.folder.find_file_by_dab_id(dab_id):
-            return
+        # if self.folder.find_file_by_dab_id(dab_id):
+        #     return
 
         # Add new DAB+ message to the Folder object
         self.folder.files.append(new_file)
