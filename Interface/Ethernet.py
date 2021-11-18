@@ -43,8 +43,8 @@ class Ethernet:
         This method is used to send the confirmation_dict using the socket connection of this class.
         The method is also responsible for retrieving the reply message.
     """
-    def write(self, confirmation_dict, max_msg_length):
-        buffer = json.dumps(confirmation_dict)
+    def write(self, dict, max_msg_length):
+        buffer = json.dumps(dict)
         self.sock.send(pad_msg_length(max_msg_length, len(buffer)))
         self.sock.send(buffer.encode())
     
