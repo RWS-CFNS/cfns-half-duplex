@@ -47,13 +47,17 @@ class Monitor(PatternMatchingEventHandler):
         # Save new DAB+ message as File object
         new_file = File(str(event.src_path).replace(self.folder.path, ""))
 
-        # Add new DAB+ message to the Folder object
-        self.folder.files.append(new_file)
-        new_file.set_lines(self.folder.path)
-
         # Get DAB+ ID & Message Type
         dab_id = new_file.get_dab_id()
         message_type = new_file.get_message_type()
+
+        # Check if File is already in folder. If so abort the confirmation and do not store the file.
+        if self.folder.find_file_by_dab_id(dab_id):
+            return
+
+        # Add new DAB+ message to the Folder object
+        self.folder.files.append(new_file)
+        new_file.set_lines(self.folder.path)
 
         # Show the contents of the file
         for line in new_file.get_lines():
