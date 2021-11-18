@@ -115,7 +115,7 @@ class Monitor(PatternMatchingEventHandler):
                 return
 
             print(device.get_technology() is "Wifi", device.get_technology() == "Wifi")
-            if device.get_technology() is "Wifi":
+            if device.get_technology() == "Wifi":
                 
                 # Change the status to confirmed if the dab_id match otherwise change the data["dab_id"] to Status.SKIP
                 new_status = Status.CONFIRMED if data.get("dab_id") == reply["ack_information"][0] else Status.SKIP
@@ -130,10 +130,10 @@ class Monitor(PatternMatchingEventHandler):
                 # print the status for every file
                 for file in self.folder.files:
                     print(file.get_status())
-            elif device.get_technology() is "LoRaWAN":
+            elif device.get_technology() == "LoRaWAN":
                 # TODO
                 ...
-            elif device.get_technology() is "LTE":
+            elif device.get_technology() == "LTE":
                 # TODO
                 ...
             else:

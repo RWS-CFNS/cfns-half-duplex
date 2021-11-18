@@ -30,7 +30,7 @@ class Device:
     """
     def has_reach(self):
         # If the technology cannot confirm that there is a receiver in reach. Return None
-        if self.technology is "AIS":
+        if self.technology == "AIS":
             return None
     
         if isinstance(self.strategy, EthernetStrategy):
