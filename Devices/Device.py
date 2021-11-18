@@ -52,7 +52,7 @@ class Device:
             print("Not known what device uses the StandardStrategy")
             return False
         else:
-            print("Interface is not set up correctly")
+            print("Strategy is not set up correctly")
             return False
 
     def set_strategy_based_on_interface_type(self, interface_type):

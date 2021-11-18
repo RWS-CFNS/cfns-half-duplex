@@ -39,7 +39,7 @@ class EthernetStrategy(Strategy):
             max_msg_length = 10 # The value is the amount of bytes the first message will be
 
             interface.init_socket(interface.ip_address, interface.socket_port)
-            with interface.socket:
+            with interface.sock:
                 interface.connect_socket() 
                 interface.write(data, max_msg_length)
                 reply = interface.read_socket(max_msg_length)
