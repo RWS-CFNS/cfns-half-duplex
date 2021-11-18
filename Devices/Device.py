@@ -22,6 +22,7 @@ class Device:
         The method uses the strategy that belongs to the interface used by the device
     """
     def acknowledge(self, data):
+        print("Confirming DAB message with dab_id: {}".format(data.get("dab_id")))
         return self.strategy.communicate(data, self.interface)
 
     """
@@ -36,6 +37,7 @@ class Device:
         if isinstance(self.strategy, EthernetStrategy):
             data = {"has_reach": self.technology} # A dict to ask the fipy if the technology has_reach
 
+            print("Asking for has_reach using the interface {} and technology {}".format(self.interface, self.technology))
             reply = self.strategy.communicate(data, self.interface)
 
             # reply is False if has_reach failes due to the reach of the technology or an error occuring. If so return False
