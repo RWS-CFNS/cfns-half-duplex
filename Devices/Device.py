@@ -32,13 +32,12 @@ class Device:
         # If the technology cannot confirm that there is a receiver in reach. Return None
         if self.technology is "AIS":
             return None
-        
-        print(self.strategy, isinstance(self.strategy, EthernetStrategy))
+    
         if isinstance(self.strategy, EthernetStrategy):
             data = {"has_reach": self.technology} # A dict to ask the fipy if the technology has_reach
 
             reply = self.strategy.communicate(data, self.interface)
-            
+            print(reply)
             if reply.get("reply") is True:
                 return True
             elif reply.get("reply") is False:
