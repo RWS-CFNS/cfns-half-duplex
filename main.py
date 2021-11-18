@@ -65,7 +65,7 @@ class Monitor(PatternMatchingEventHandler):
             data["dab_signal"] = get_dab_signal()
         
         # Choose the best possible device or devices if the reach of the device can not be determined
-        devices = self.choose_device(dab_id)
+        devices = self.choose_device()
 
         # If there is no device available abort the acknowledgment
         if not devices:
