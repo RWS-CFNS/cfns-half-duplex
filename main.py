@@ -88,11 +88,17 @@ class Monitor(PatternMatchingEventHandler):
         if not self.devices:
             return False
 
-        # This are the devices that are in reach of a receiver that can receive data using their technology
-        devices_have_reach = [device for device in self.devices.copy() if device.has_reach()]
+        # Initialize the lists to fill with the correct devices
+        devices_have_reach = []
+        devices_not_able_to_calc_reach = []
 
-        # This are the devices that can not determine if they are within reach or not
-        devices_not_able_to_calc_reach = [device for device in self.devices.copy() if device.has_reach() is None]
+        # Fill the lists with the correct devices
+        for device in self.devices.copy(): 
+            has_reach = device.has_reach()
+            if has_reach:
+                devices_have_reach.append(device)  
+            elif has_reach == None:
+                devices_not_able_to_calc_reach.append(device)
 
         if devices_have_reach:
             # Find the device with the highest priority. Highest priority is the lowest device.priority value
