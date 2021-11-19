@@ -8,6 +8,8 @@ from watchdog.events import PatternMatchingEventHandler
 from Devices.Device import Device
 from Folder import Folder
 from File import File
+from Interface.Ethernet import Ethernet
+from Interface.I2C import I2C
 from Status import Status
 from SenderID import SenderID
 import time
@@ -20,6 +22,7 @@ class Monitor(PatternMatchingEventHandler):
         PatternMatchingEventHandler.__init__(self, patterns=['*.txt'], ignore_directories=True, case_sensitive=False)
         self.folder = folder
         self.devices = []
+        self.devices_csv_filename = ""
 
     """
         This method creates the confirmation dictionary
@@ -69,6 +72,7 @@ class Monitor(PatternMatchingEventHandler):
             data["dab_signal"] = get_dab_signal()
         
         # Choose the best possible device or devices if the reach of the device can not be determined
+        self.devices = attach_devices(self.devices_csv_filename)
         devices = self.choose_device()
 
         # If there is no device available abort the acknowledgment
@@ -115,8 +119,9 @@ class Monitor(PatternMatchingEventHandler):
     """
     def acknowledge(self, data, devices):
         for device in devices:
-            # Add the technology to the confirmation dict
             data["technology"] = device.get_technology()
+            
+            # Get the result of the acknowledgment
             reply = device.acknowledge(data)
 
             if not reply:
@@ -124,26 +129,24 @@ class Monitor(PatternMatchingEventHandler):
                 self.folder.update_file(data.get("dab_id"), status=Status.SKIP)
                 return
 
-            if device.get_technology() == "Wifi":
-                
-                # Change the status to confirmed if the dab_id match otherwise change the data["dab_id"] to Status.SKIP
+            if isinstance(device.interface, Ethernet):
+                # Change the status to confirmed if the dab_id match otherwise change the data["dab_id"] to Status.SKIP when technology also Wifi, LTE or LoRaWAN is 
                 new_status = Status.CONFIRMED if data.get("dab_id") == reply["ack_information"][0] else Status.SKIP
                 self.folder.update_file(data.get("dab_id"), status=new_status, valid=reply["ack_information"][1])
 
-                for entry in reply.get("AIS_ack_information"):
-                    self.folder.update_file(entry[0], status=Status.CONFIRMED, valid=entry[1])
+                if device.get_technology() == "Wifi":
+                    for entry in reply.get("AIS_ack_information"):
+                        self.folder.update_file(entry[0], status=Status.CONFIRMED, valid=entry[1])
 
-                for entry in reply.get("invalid_dab_confirmations"):
-                    self.folder.update_file(entry[0], valid=entry[1])
+                    for entry in reply.get("invalid_dab_confirmations"):
+                        self.folder.update_file(entry[0], valid=entry[1])
 
-                # print the status for every file
-                for file in self.folder.files:
-                    print(file.get_status())
-            elif device.get_technology() == "LoRaWAN":
-                # TODO
-                ...
-            elif device.get_technology() == "LTE":
-                # TODO
+                    # print the status for every file
+                    for file in self.folder.files:
+                        print(file.get_status())
+
+            elif device.get_technology() == "LoRaWAN" and isinstance(device.interface, I2C):
+                # TODO implement Sodaq One reply
                 ...
             else:
                 # TODO wat als het AIS, VDES...
@@ -171,8 +174,8 @@ def execute():
     observer = Observer()
     observer.schedule(event_handler, path=event_handler.folder.path, recursive=True)
 
-    # Assign list of devices attached to the system
-    event_handler.devices = attach_devices(args.devices)
+    # Let the monitor no what the filename of devices is. So it can attach_devices later.
+    event_handler.devices_csv_filename = args.devices
 
     # Start the observing of the folder args.folder. When something changes start on_created in the event_handler
     observer.start()
