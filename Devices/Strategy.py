@@ -9,15 +9,34 @@ class Strategy(ABC):
     def communicate(self, data, interface):
         """Subclasses need to implement this method."""
 
-class StandardStrategy(Strategy):
+class I2CStrategy(Strategy):
+    """Class to define how to communcicate with a I2C interface."""
     def communicate(self, data, interface):
         try:
             interface.write(data)
+            
+            # Return the received message if a message is received. Else return False
+            reply = interface.read_i2c()
+            return reply if reply else False 
+        except Exception as e:
+            print(e)
+            return False
+
+class SPIStrategy(Strategy):
+    """Class to define how to communcicate with a SPI interface."""
+    def communicate(self, data, interface):
+        try:
+            interface.write(data)
+
+            # Return the received message if a message is received. Else return False
+            reply = interface.read_spi()
+            return reply if reply else False 
         except Exception as e:
             print(e)
             return False
 
 class AISStrategy(Strategy):
+    """Class to define how with communicate to an AIS device."""
     def communicate(self, data, interface):
         try:
             if data.get("message_type") == 4:
@@ -34,6 +53,7 @@ class AISStrategy(Strategy):
             return False
 
 class EthernetStrategy(Strategy):
+    """Class to define how to communcicate with an ethernet interface."""
     def communicate(self, data, interface):
         try:
             max_msg_length = 10 # The value is the amount of bytes the first message will be

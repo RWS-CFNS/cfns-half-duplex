@@ -49,8 +49,8 @@ class Device:
             else:
                 # reply is False if has_reach failes due to the reach of the technology or an error occuring
                 return False
-        elif isinstance(self.strategy, StandardStrategy):
-            # Don't no what kind of device uses StandardStrategy. Therefore it is not possible to determine has_reach. So return False to skip using this device
+        elif isinstance(self.strategy, StandardStrategy) and isinstance(self.interface, I2C):
+            # No implementation for Sodaq One yet
             print("Not known what device uses the StandardStrategy")
             return False
         else:
