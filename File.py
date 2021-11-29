@@ -35,10 +35,9 @@ class File:
         self.time_of_arrival = time.time()
 
     def set_lines(self, path):
-        my_lines = []  # Declare an empty list named mylines.
         with open(str(path+self.filename), 'rt') as my_file:  # Open lorem.txt for reading text data.
             for my_line in my_file:  # For each line, stored as myline,
-                my_lines.append(my_line.strip(os.linesep))  # add its contents to mylines without the lineseperator. This works for all operating systems
+                self.lines.append(my_line.strip(os.linesep))  # add its contents to mylines without the lineseperator. This works for all operating systems
 
     """
         This method will extract the data from the lines and put it in the corresponding field.
