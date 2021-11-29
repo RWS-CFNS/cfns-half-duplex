@@ -1,20 +1,15 @@
 #!/usr/bin/python
-from Devices.Strategy import AISStrategy, EthernetStrategy, I2CStrategy, SPIStrategy
-from Interface.I2C import I2C
-from Interface.Ethernet import Ethernet
-from Interface.UART import UART
-from Interface.SPI import SPI
+from Devices.Strategy import AISStrategy, EthernetStrategy, I2CStrategy
 
 class Device:
     """A Class to represent the device that is responsible for acknowledging a message."""
     
-    def __init__(self, name, branch, model, interface_type, technology, priority):
+    def __init__(self, name, branch, model, technology, priority):
         self.name = name
         self.branch = branch
         self.model = model
         self.technology = technology
         self.priority = priority
-        self.strategy = self.set_strategy_based_on_interface_type(interface_type)
     
     """
         This method is used to acknowledge a message using this device. 
@@ -22,7 +17,7 @@ class Device:
     """
     def acknowledge(self, data):
         print("Confirming DAB message with dab_id: {}".format(data.get("dab_id")))
-        return self.strategy.communicate(data, self.interface)
+        return self.strategy.communicate(data)
 
     """
         This method tries to determine if the device connected this object is within reach of a receiver.
@@ -35,8 +30,8 @@ class Device:
         elif isinstance(self.strategy, EthernetStrategy):
             data = {"has_reach": self.technology} # A dict to ask the fipy if the technology has_reach
 
-            print("Asking for has_reach using the interface {} and technology {}".format(self.interface.__class__.__name__, self.technology))
-            reply = self.strategy.communicate(data, self.interface)
+            print(f"Asking for has_reach using the technology: {self.technology}")
+            reply = self.strategy.communicate(data)
 
             # reply is False if has_reach failes due to the reach of the technology or an error occuring. If so return False
             if not reply:
@@ -59,18 +54,6 @@ class Device:
         else:
             print("Unknown strategy to device.has_reach()!")
             return False
-
-    def set_strategy_based_on_interface_type(self, interface_type):
-        if interface_type == 0:
-            return AISStrategy()
-        elif interface_type == 1:
-            return I2CStrategy()
-        elif interface_type == 2:
-            return EthernetStrategy()
-        elif interface_type == 3:
-            return SPIStrategy()
-        else:
-            return None
         
     def set_strategy(self, strategy):
         self.strategy = strategy
