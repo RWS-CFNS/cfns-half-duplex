@@ -131,8 +131,12 @@ class Monitor(PatternMatchingEventHandler):
     """
     def acknowledge(self, data, devices):
         for device in devices:
-            data["technology"] = device.get_technology()
-            
+            # Change data when using the Sodaq One. Otherwise add the technology used by the device.
+            if isinstance(device.strategy, I2CStrategy):
+                data = {key:value for key, value in data.items() if key == "dab_id" or key == "message_type"}
+            else:
+                data["technology"] = device.get_technology()
+
             # Get the result of the acknowledgment
             reply = device.acknowledge(data)
 
