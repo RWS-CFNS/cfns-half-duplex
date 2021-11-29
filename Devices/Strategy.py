@@ -52,7 +52,9 @@ class I2CStrategy(Strategy):
 
             if "dab_id" in data:
                 dab_id_bytes = data.get("dab_id").to_bytes(2, 'little')
-                data_list.insert(0,dab_id_bytes) # the i2c device expects the dab_id at the first place as two bytes in little endian order.
+                # the i2c device expects the dab_id at the first place as two bytes at two seperate places in little endian order.
+                data_list.insert(0,dab_id_bytes[0]) 
+                data_list.insert(1,dab_id_bytes[1])
 
             return data_list
         else:

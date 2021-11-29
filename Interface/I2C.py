@@ -44,7 +44,8 @@ class I2C:
                 print("No device connected to bus")
                 pass
 
-    def write(self, data):        
+    def write(self, data): 
+        print(data, type(data))       
         msg = i2c_msg.write(self.target_address, data)
         self.bus.i2c_rdwr(msg)
         print("I2C data send for acknowledgement: ", data)
