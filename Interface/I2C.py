@@ -29,12 +29,6 @@ class I2C:
     def get_target_address(self): 
         return self.target_address
 
-    def set_address(self, target_address):
-        if not target_address == self.address:
-            self.target_address = target_address 
-        else:
-            raise ValueError("the target_address can not be the same as the address of this interface.")
-
     def init_i2c(self, target_address):
         self.target_address = target_address
         self.bus = SMBus(1)

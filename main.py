@@ -246,7 +246,7 @@ def attach_devices(csv_parameter):
                 if int(row["interface_type"]) == 1:
                     print(row["name"])
                     interface = I2C()
-                    interface.init_i2c(row["address"])
+                    interface.init_i2c(int(row["address"]))
                     strategy = I2CStrategy(interface)
                     listed_devices.append(device)
 
@@ -260,7 +260,7 @@ def attach_devices(csv_parameter):
                 if int(row["interface_type"]) == 3:
                     print(row["name"])
                     interface = SPI()
-                    interface.init_spi(row["address"], int(row["setting"]))
+                    interface.init_spi(int(row["address"]), int(row["setting"]))
                     strategy = SPIStrategy(interface)
                     listed_devices.append(device)
                 
