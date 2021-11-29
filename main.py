@@ -2,17 +2,16 @@ import os
 import sys
 import argparse
 import csv
+import threading
 from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler
 
 from Devices.Device import Device
+from Devices.Strategy import AISStrategy, EthernetStrategy, I2CStrategy, SPIStrategy
 from Folder import Folder
 from File import File
-from Interface.Ethernet import Ethernet
-from Interface.I2C import I2C
 from Status import Status
 from SenderID import SenderID
-import time
 
 class Monitor(PatternMatchingEventHandler):
     """A Class to handle incoming DAB files."""
@@ -28,39 +27,50 @@ class Monitor(PatternMatchingEventHandler):
         This method creates the confirmation dictionary
     """
     def create_confirmation_dict(self, dab_id, message_type, time_of_arrival):
-        SenderID().store_ID()
+        senderID = SenderID()
+
+        # Stores an id when the file with the id is empty.
+        senderID.store_ID()
         
-        return {
+        confirmation_dict = {
             "dab_id": dab_id,
             "message_type": message_type,
             "dab_msg_arrived_at": time_of_arrival,
-            "sender": SenderID().read_ID()
+            "sender": senderID.read_ID() # Read the id from id.txt
         }
+
+        if message_type == 4:
+            confirmation_dict["dab_signal"] = get_dab_signal()
+
+        return confirmation_dict
 
     """
         This method will be called when the observer detects a file being created in the folder that it observes.
     """
     def on_created(self, event):
-        # This var keeps track of the time of arrival of a dab message
-        time_of_arrival = time.time()
-
         print(event.src_path, event.event_type)
-        time.sleep(1)
 
-        # Save new DAB+ message as File object
+        # Save new DAB+ message as File object and fill it with the data from the .txt file.
         new_file = File(str(event.src_path).replace(self.folder.path, ""))
         new_file.set_lines(self.folder.path)
+        new_file.set_information()
 
-        # Get DAB+ ID & Message Type
+        # Get DAB+ ID ,Message Type and time_of_arrival
         dab_id = new_file.get_dab_id()
         message_type = new_file.get_message_type()
+        time_of_arrival = new_file.get_time_of_arrival()
 
-        # Check if File is already in folder. If so abort the confirmation and do not store the file.
-        if self.folder.find_file_by_dab_id(dab_id):
+        """
+            Check if File is already in folder and confirmed, if so abort the confirmation and do not store the file.
+            If the File is not in the folder store the new_file in the folder. 
+            Else do not append the file and continue confirming the file.
+        """
+        file_in_folder = self.folder.find_file_by_dab_id(dab_id)
+        if file_in_folder and file_in_folder.status == Status.CONFIRMED:
             return
-
-        # Add new DAB+ message to the Folder object
-        self.folder.files.append(new_file)
+        elif not file_in_folder:
+            # Add new DAB+ message to the Folder object
+            self.folder.files.append(new_file)
 
         # Show the contents of the file
         for line in new_file.get_lines():
@@ -68,20 +78,18 @@ class Monitor(PatternMatchingEventHandler):
 
         # Build the confirmation dict which contains all the necessary information to acknowledge a DAB messsage
         data = self.create_confirmation_dict(dab_id, message_type, time_of_arrival)
-        if message_type == 4:
-            data["dab_signal"] = get_dab_signal()
         
         # Choose the best possible device or devices if the reach of the device can not be determined
         self.devices = attach_devices(self.devices_csv_filename)
         devices = self.choose_device()
 
-        # If there is no device available abort the acknowledgment
+        # If there is no device available. Abort the acknowledgment
         if not devices:
             self.folder.update_file(dab_id, status=Status.SKIP)
             return
-
-        # Start the acknowledgment
-        self.acknowledge(data, devices)
+        else:           
+            # Start the acknowledgment
+            self.acknowledge(data, devices)
 
     """
         This method chooses the best device based on the reach the technology of the device has, the specifics of the used technology and the availability of the device. 
@@ -97,7 +105,7 @@ class Monitor(PatternMatchingEventHandler):
         devices_not_able_to_calc_reach = []
 
         # Fill the lists with the correct devices
-        for device in self.devices.copy(): 
+        for device in self.devices: 
             has_reach = device.has_reach()
             if has_reach:
                 devices_have_reach.append(device)  
@@ -129,28 +137,43 @@ class Monitor(PatternMatchingEventHandler):
                 self.folder.update_file(data.get("dab_id"), status=Status.SKIP)
                 return
 
-            if isinstance(device.interface, Ethernet):
-                # Change the status to confirmed if the dab_id match otherwise change the data["dab_id"] to Status.SKIP when technology also Wifi, LTE or LoRaWAN is 
-                new_status = Status.CONFIRMED if data.get("dab_id") == reply["ack_information"][0] else Status.SKIP
-                self.folder.update_file(data.get("dab_id"), status=new_status, valid=reply["ack_information"][1])
+            if isinstance(device.strategy, EthernetStrategy):
+                # The new status will be CONFIRMATION_SENT if the dab_id match and the technology is not Wifi. If the dab_id does not match the status will be SKIP.
+                new_status = Status.CONFIRMATION_SENT if data.get("dab_id") == reply["ack_information"][0] else Status.SKIP
 
                 if device.get_technology() == "Wifi":
-                    for entry in reply.get("AIS_ack_information"):
+                    # Change the status to confirmed if the tech happens to be Wifi. Only for this technology you can be certain that the message was confirmed or not.
+                    new_status = Status.CONFIRMED if data.get("dab_id") == reply["ack_information"][0] else Status.SKIP
+                    
+                    # Update the status and validity of the files that have been received by the server.
+                    for entry in reply.get("different_ack_information"):
                         self.folder.update_file(entry[0], status=Status.CONFIRMED, valid=entry[1])
 
-                    for entry in reply.get("invalid_dab_confirmations"):
-                        self.folder.update_file(entry[0], valid=entry[1])
-
-                    # print the status for every file
-                    for file in self.folder.files:
-                        print(file.get_status())
-
-            elif device.get_technology() == "LoRaWAN" and isinstance(device.interface, I2C):
-                # TODO implement Sodaq One reply
-                ...
+                # Update the status of the file that this confirmation tries to confirm to new_status. Which is CONFIRMATION_SENT when the technology is not Wifi otherwise it will be CONFIRMED.
+                self.folder.update_file(data.get("dab_id"), status=new_status, valid=reply["ack_information"][1])
             else:
-                # TODO wat als het AIS, VDES...
-                ...        
+                # implements the change status to skip or confirmed when the device used the i2c strategy.
+                new_status = Status.CONFIRMATION_SENT if reply else Status.SKIP
+                self.folder.update_file(data.get("dab_id"), status=new_status)
+
+            # print the status for every file
+            for file in self.folder.files:
+                print(file.get_dab_id(), file.get_status())
+
+    def retry_failed_confirmation(self):
+        for file in self.folder:
+            if file.get_status() == Status.UNCONFIRMED:
+                # Build the confirmation dict which contains all the necessary information to acknowledge a DAB messsage
+                data = self.create_confirmation_dict(file.get_dab_id(), file.get_message_type(), file.get_time_of_arrival())
+                
+                # Choose the best possible device or devices if the reach of the device can not be determined
+                self.devices = attach_devices(self.devices_csv_filename)
+                devices = self.choose_device()
+
+                thread = threading.Thread(target=self.acknowledge, args=(data, devices))
+                thread.start()
+            elif file.get_status() == Status.SKIP:
+                file.set_status(Status.UNCONFIRMED)
 
 """
     This function is the main function that handles starting the monitor and observer
@@ -181,14 +204,12 @@ def execute():
     observer.start()
     print("Monitoring started")
     try:
-        while (True):
-            time.sleep(1)
-
+        while True:
+            event_handler.retry_failed_confirmation()
     except KeyboardInterrupt:
         observer.stop()
         print("Monitoring Stopped")
     observer.join()
-
 
 def get_dab_signal():
     return 20
@@ -222,7 +243,7 @@ def attach_devices(csv_parameter):
 
                 if int(row["interface_type"]) == 2:
                     print(row["name"])
-                    device.interface.init_socket(row["address"], int(row["setting"]))
+                    device.interface.init_socket(row["address"], int(row["setting"])) # Address and setting are here the ip_address and the portnumber of the target device.
                     listed_devices.append(device)
 
                 if int(row["interface_type"]) == 3:
@@ -236,14 +257,13 @@ def attach_devices(csv_parameter):
         if line_count > 1:
             return listed_devices
         else:
-            print("No devices are listed. Configure {} and execute the program again".format(csv_parameter))
+            print(f"No devices are listed. Configure {csv_parameter} and execute the program again")
             sys.exit()
     except RuntimeError:
         print("Could not open list with devices")
 
 
 if __name__ == "__main__":
-
     try:
         execute()
     except RuntimeError:

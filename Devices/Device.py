@@ -1,5 +1,5 @@
 #!/usr/bin/python
-from Devices.Strategy import AISStrategy, EthernetStrategy, StandardStrategy, Strategy
+from Devices.Strategy import AISStrategy, EthernetStrategy, I2CStrategy, SPIStrategy
 from Interface.I2C import I2C
 from Interface.Ethernet import Ethernet
 from Interface.UART import UART
@@ -7,9 +7,8 @@ from Interface.SPI import SPI
 
 class Device:
     """A Class to represent the device that is responsible for acknowledging a message."""
-
+    
     def __init__(self, name, branch, model, interface_type, technology, priority):
-        self.interface = self.set_interface(interface_type)
         self.name = name
         self.branch = branch
         self.model = model
@@ -31,10 +30,9 @@ class Device:
     """
     def has_reach(self):
         # If the technology cannot confirm that there is a receiver in reach. Return None
-        if self.technology == "AIS":
+        if isinstance(self.strategy, AISStrategy):
             return None
-    
-        if isinstance(self.strategy, EthernetStrategy):
+        elif isinstance(self.strategy, EthernetStrategy):
             data = {"has_reach": self.technology} # A dict to ask the fipy if the technology has_reach
 
             print("Asking for has_reach using the interface {} and technology {}".format(self.interface.__class__.__name__, self.technology))
@@ -49,23 +47,28 @@ class Device:
             else:
                 # reply is False if has_reach failes due to the reach of the technology or an error occuring
                 return False
-        elif isinstance(self.strategy, StandardStrategy) and isinstance(self.interface, I2C):
-            # No implementation for Sodaq One yet
-            print("Not known what device uses the StandardStrategy")
-            return False
+        elif isinstance(self.strategy, I2CStrategy):
+            """
+                data = [1] means that it will ask the sodaq one if it has a connection with TTN or not?
+                reply will be 0, 1 or False
+            """
+            reply = self.strategy.communicate(data=[1])
+            
+            # 0 will evaluate False and return False. While 1 evaluates True and returns True
+            return True if reply else False
         else:
-            print("Strategy is not set up correctly")
+            print("Unknown strategy to device.has_reach()!")
             return False
 
     def set_strategy_based_on_interface_type(self, interface_type):
         if interface_type == 0:
             return AISStrategy()
         elif interface_type == 1:
-            return StandardStrategy()
+            return I2CStrategy()
         elif interface_type == 2:
             return EthernetStrategy()
         elif interface_type == 3:
-            return StandardStrategy()
+            return SPIStrategy()
         else:
             return None
         
@@ -75,28 +78,6 @@ class Device:
     def get_strategy(self):
         return self.strategy
 
-    def set_interface(self, interface_type):
-        """
-        Interface value (interface_type) given by the Device-object
-        must be equal to the following interfaces to make use of the implementation
-        
-        UART                =   0 
-        I2C                 =   1
-        Socket (Ethernet)   =   2
-        SPI                 =   3
-        """
-        if interface_type == 0:
-            return UART()
-        elif interface_type == 1:
-            return I2C()
-        elif interface_type == 2:
-            return Ethernet()
-        elif interface_type == 3:
-           return SPI()
-
-    def get_interface(self):
-        return self.interface
-        
     def get_name(self):
         return self.name
 

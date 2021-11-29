@@ -23,17 +23,20 @@ from smbus2 import SMBus, i2c_msg # type: ignore this line
 
 class I2C:
     def __init__(self):
-        self.address = 0
+        self.target_address = 0
         self.bus = SMBus()
 
-    def get_address(self):
-        return self.address
+    def get_target_address(self): 
+        return self.target_address
 
-    def set_address(self, new_address):
-        self.address = new_address
+    def set_address(self, target_address):
+        if not target_address == self.address:
+            self.target_address = target_address 
+        else:
+            raise ValueError("the target_address can not be the same as the address of this interface.")
 
-    def init_i2c(self, address):
-        self.address = address
+    def init_i2c(self, target_address):
+        self.target_address = target_address
         self.bus = SMBus(1)
 
     def list_i2c(self):
@@ -47,23 +50,13 @@ class I2C:
                 print("No device connected to bus")
                 pass
 
-    def write(self, data):
-        try:
-            # Write a single byte to address 80
-            buff = []
-            buff.append(data.get("dab_id"))
-            buff.append(data.get("message_type"))
-            if "dab_signal" in data:
-                buff.append(data.get("dab_signal"))
-            msg = i2c_msg.write(self.address, buff)
-            self.bus.i2c_rdwr(msg)
-            print("I2C data send for acknowledgement: ", buff)
-        except:
-            print("Could not send by I2C")
-            pass
-
-    def read_i2c(self):
-        # Read 64 bytes from address 80
-        msg = i2c_msg.read(self.address, 64)
+    def write(self, data):        
+        msg = i2c_msg.write(self.target_address, data)
         self.bus.i2c_rdwr(msg)
-        return msg
+        print("I2C data send for acknowledgement: ", data)
+
+    def read_i2c(self, amount_of_bytes):
+        reply = i2c_msg.read(self.target_address, amount_of_bytes)
+        self.bus.i2c_rdwr(reply)
+        return list(reply)
+

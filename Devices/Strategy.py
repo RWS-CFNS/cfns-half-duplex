@@ -1,3 +1,7 @@
+from Interface.Ethernet import Ethernet
+from Interface.I2C import I2C
+from Interface.SPI import SPI
+from Interface.UART import UART
 from aisutils import nmea
 from aisutils import BitVector
 from aisutils import binary
@@ -6,38 +10,87 @@ from abc import ABC, abstractmethod
 
 class Strategy(ABC):
     @abstractmethod
-    def communicate(self, data, interface):
-        """Subclasses need to implement this method."""
+    def communicate(self, data) -> bool:
+        """Subclasses need to implement this method. It must returns a bool value """
 
 class I2CStrategy(Strategy):
     """Class to define how to communcicate with a I2C interface."""
-    def communicate(self, data, interface):
+    
+    def __init__(self):
+        self.interface = I2C()
+        self.amount_of_bytes_to_read = 2
+
+    """
+        Converts the data to a list, because the I2C class requires the data in a list format.
+        If the data_list is one item long with that item being a one it means that it ask the device if it has reach or not.
+        The device will return that answer at the first place of reply. And the answer for the confirmation at the second place of reply. 
+    """
+    def communicate(self, data):
         try:
-            interface.write(data)
+            data_list = self.data_dict_to_list(data)
+            if not data_list:
+                return False
             
-            # Return the received message if a message is received. Else return False
-            reply = interface.read_i2c()
+            self.interface.write(data_list)
+
+            if len(data_list) == 1 and data_list[0] == 1: # Has_reach reply
+                reply = self.interface.read_i2c(self.amount_of_bytes_to_read)[0]
+            else: # DAB confirmation reply
+                reply = self.interface.read_i2c(self.amount_of_bytes_to_read)[1]
             return reply if reply else False 
-        except Exception as e:
+        except OSError as e:
             print(e)
             return False
+        except OverflowError as e:
+            print(e)
+            return False
+    
+    def data_dict_to_list(self, data):
+        if isinstance(data, list):
+            return data
+        elif isinstance(data, dict):
+            data_list = [value for key, value in data.items() if not key == "dab_id"]
+
+            if "dab_id" in data:
+                dab_id_bytes = data.get("dab_id").to_bytes(2, 'little')
+                data_list.insert(0,dab_id_bytes) # the i2c device expects the dab_id at the first place as two bytes in little endian order.
+
+            return data_list
+        else:
+            return False
+
 
 class SPIStrategy(Strategy):
     """Class to define how to communcicate with a SPI interface."""
-    def communicate(self, data, interface):
-        try:
-            interface.write(data)
 
-            # Return the received message if a message is received. Else return False
-            reply = interface.read_spi()
-            return reply if reply else False 
-        except Exception as e:
+    def __init__(self):
+        self.interface = SPI()
+    
+    def communicate(self, data):
+        try:
+            # The code is commented because there is no device that uses the SPIStrategy yet. So the values are not known and implementation could cause crashes
+            # # new_spi_bus = 
+            # # new_spi_device = 
+            # self.interface.set_spi_bus(new_spi_bus)
+            # self.interface.set_spi_device(new_spi_device)
+            # self.interface.open_spi()
+            # self.interface.write(data.get("dab_id"), data.get("message_type"))
+
+            # reply = self.interface.read_spi()
+            # self.interface.close_spi()
+            # return True if reply else False 
+            return False
+        except Exception as e: # no specific exception defined, becaus spi has not been implemented for any of the used technologies. Therefore there is no specific exception knownspi.clo
             print(e)
             return False
 
 class AISStrategy(Strategy):
     """Class to define how with communicate to an AIS device."""
-    def communicate(self, data, interface):
+    
+    def __init__(self):
+        self.interface = UART()
+
+    def communicate(self, data):
         try:
             if data.get("message_type") == 4:
                 msg = '  ACK:' + str(data.get("dab_id")) + ',MSG:' + str(data.get("message_type")) + ',RSSI:' + str(data.get("dab_signal")) + ',SNR:-1'
@@ -47,22 +100,27 @@ class AISStrategy(Strategy):
             aisBits = BitVector.BitVector(textstring=msg)
             payloadStr, pad = binary.bitvectoais6(aisBits)  # [0]
             buffer = nmea.bbmEncode(1, 1, 0, 1, 8, payloadStr, pad, appendEOL=False)
-            interface.write(buffer)
+            self.interface.write(buffer)
+            return True
         except Exception as e:
             print(e)
             return False
 
 class EthernetStrategy(Strategy):
     """Class to define how to communcicate with an ethernet interface."""
-    def communicate(self, data, interface):
+
+    def __init__(self):
+        self.interface = Ethernet()
+    
+    def communicate(self, data):
         try:
             max_msg_length = 10 # The value is the amount of bytes the first message will be
 
-            interface.init_socket(interface.ip_address, interface.socket_port)
-            with interface.sock:
-                interface.connect_socket() 
-                interface.write(data, max_msg_length)
-                reply = interface.read_socket(max_msg_length)
+            self.interface.init_socket(self.interface.ip_address, self.interface.socket_port)
+            with self.interface.sock:
+                self.interface.connect_socket() 
+                self.interface.write(data, max_msg_length)
+                reply = self.interface.read_socket(max_msg_length)
                 return reply if reply else False
         except Exception as e:
             print(e)

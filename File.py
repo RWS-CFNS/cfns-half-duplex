@@ -19,23 +19,31 @@
 #    along with cfns-half-duplex. If not, see <https://www.gnu.org/licenses/>.
 #
 
+import time
+import os
 import Status
 
 class File:
-    def __init__(self, filename):
+    def __init__(self, filename, status=Status.Status.CONFIRMING):
         self.filename = filename
         self.lines = []
         self.dab_id = 0
         self.message_type = 0
-        self.status = Status.Status.UNCONFIRMED 
+        self.status = status
         self.valid = True
+        self.retry = False
+        self.time_of_arrival = time.time()
 
     def set_lines(self, path):
         my_lines = []  # Declare an empty list named mylines.
         with open(str(path+self.filename), 'rt') as my_file:  # Open lorem.txt for reading text data.
             for my_line in my_file:  # For each line, stored as myline,
-                my_lines.append(my_line)  # add its contents to mylines.
-        self.lines = my_lines
+                my_lines.append(my_line.strip(os.linesep))  # add its contents to mylines without the lineseperator. This works for all operating systems
+
+    """
+        This method will extract the data from the lines and put it in the corresponding field.
+    """
+    def set_information(self):
         self.dab_id = int(self.lines[0])
         self.message_type = int(self.lines[1])
 
@@ -64,4 +72,7 @@ class File:
 
     def get_valid(self):
         return self.valid
+    
+    def get_time_of_arrival(self):
+        return self.time_of_arrival
 

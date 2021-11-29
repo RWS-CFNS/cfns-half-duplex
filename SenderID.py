@@ -12,7 +12,10 @@ class SenderID:
     def generate_ID(self):
         return uuid.uuid4()
 
-    def store_ID(self):
+    """
+        Store a new ID when the file is empty otherwise do nothing
+    """
+    def store_ID(self):   
         with open(self.filename, 'a') as file:
             if os.stat(self.filename).st_size == 0:
                 file.write(str(self.generate_ID()))

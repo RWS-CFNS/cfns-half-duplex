@@ -21,11 +21,12 @@
 
 import time
 import unittest
+from Devices.Strategy import AISStrategy, I2CStrategy
 
 import main
 from File import File
 from Folder import Folder
-from Device import Device
+from Devices.Device import Device
 from Interface import Interface
 from main import Monitor, attach_devices
 
@@ -87,27 +88,27 @@ class MyTestCase(unittest.TestCase):
         result_name = test_device.get_name()
         result_branch = test_device.get_branch()
         result_model = test_device.get_model()
-        result_interface = test_device.get_interface()
+        result_strategy = test_device.get_strategy()
 
         self.assertEqual("AIS Transponder1", result_name)
         self.assertEqual("True Heading", result_branch)
         self.assertEqual("AIS Base Station", result_model)
-        self.assertEqual(0, result_interface)
+        self.assertEqual(AISStrategy, result_strategy)
 
         test_device.set_name("test_name")
         test_device.set_branch("python_unit")
         test_device.set_model("PU-00")
-        test_device.set_interface(1)
+        test_device.set_strategy_based_on_interface_type(1)
 
         new_result_name = test_device.get_name()
         new_result_branch = test_device.get_branch()
         new_result_model = test_device.get_model()
-        new_result_interface = test_device.get_interface()
+        new_result_strategy = test_device.get_strategy()
 
         self.assertEqual("test_name", new_result_name)
         self.assertEqual("python_unit", new_result_branch)
         self.assertEqual("PU-00", new_result_model)
-        self.assertEqual(1, new_result_interface)
+        self.assertEqual(I2CStrategy, new_result_strategy)
 
     def test_rs232(self):
         test_rs232 = Interface.UART()

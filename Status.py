@@ -6,4 +6,5 @@ class Status(enum.Enum):
     CONFIRMING = 2
     CONFIRMED = 3
     SKIP = 4
+    CONFIRMATION_SENT = 5
     
