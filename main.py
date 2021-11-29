@@ -161,6 +161,7 @@ class Monitor(PatternMatchingEventHandler):
                 self.folder.update_file(data.get("dab_id"), status=new_status)
 
             # print the status for every file
+            print("Status of files (dab_id, file status")
             for file in self.folder.files:
                 print(file.get_dab_id(), file.get_status())
 
