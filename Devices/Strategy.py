@@ -1,7 +1,3 @@
-from Interface.Ethernet import Ethernet
-from Interface.I2C import I2C
-from Interface.SPI import SPI
-from Interface.UART import UART
 from aisutils import nmea
 from aisutils import BitVector
 from aisutils import binary
@@ -9,6 +5,9 @@ from aisutils import binary
 from abc import ABC, abstractmethod
 
 class Strategy(ABC):
+    def __init__(self, interface):
+        self.interface = interface
+
     @abstractmethod
     def communicate(self, data) -> bool:
         """Subclasses need to implement this method. It must returns a bool value """
@@ -16,8 +15,8 @@ class Strategy(ABC):
 class I2CStrategy(Strategy):
     """Class to define how to communcicate with a I2C interface."""
     
-    def __init__(self):
-        self.interface = I2C()
+    def __init__(self, interface):
+        super().__init__(interface)
         self.amount_of_bytes_to_read = 2
 
     """
@@ -62,10 +61,10 @@ class I2CStrategy(Strategy):
 
 class SPIStrategy(Strategy):
     """Class to define how to communcicate with a SPI interface."""
-
-    def __init__(self):
-        self.interface = SPI()
     
+    def __init__(self, interface):
+        super().__init__(interface)
+
     def communicate(self, data):
         try:
             # The code is commented because there is no device that uses the SPIStrategy yet. So the values are not known and implementation could cause crashes
@@ -87,8 +86,8 @@ class SPIStrategy(Strategy):
 class AISStrategy(Strategy):
     """Class to define how with communicate to an AIS device."""
     
-    def __init__(self):
-        self.interface = UART()
+    def __init__(self, interface):
+        super().__init__(interface)
 
     def communicate(self, data):
         try:
@@ -109,8 +108,8 @@ class AISStrategy(Strategy):
 class EthernetStrategy(Strategy):
     """Class to define how to communcicate with an ethernet interface."""
 
-    def __init__(self):
-        self.interface = Ethernet()
+    def __init__(self, interface):
+        super().__init__(interface)
     
     def communicate(self, data):
         try:

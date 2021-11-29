@@ -8,6 +8,10 @@ from watchdog.events import PatternMatchingEventHandler
 
 from Devices.Device import Device
 from Devices.Strategy import AISStrategy, EthernetStrategy, I2CStrategy, SPIStrategy
+from Interface.Ethernet import Ethernet
+from Interface.I2C import I2C
+from Interface.SPI import SPI
+from Interface.UART import UART
 from Folder import Folder
 from File import File
 from Status import Status
@@ -230,27 +234,37 @@ def attach_devices(csv_parameter):
                     print(f'Column names are {", ".join(row)}')
                     line_count += 1
                     
-                device = Device(row["name"], row["branch"], row["model"], int(row["interface_type"]), row["technology"], int(row["priority"]))
+                device = Device(row["name"], row["branch"], row["model"], row["technology"], int(row["priority"]))
                 if int(row["interface_type"]) == 0:
                     print(row["name"])
-                    device.interface.init_serial(row["address"], int(row["setting"]))
+                    interface = UART()
+                    interface.init_serial(row["address"], int(row["setting"]))
+                    strategy = AISStrategy(interface)
                     listed_devices.append(device)
 
                 if int(row["interface_type"]) == 1:
                     print(row["name"])
-                    device.interface.init_i2c(int(row["address"]))
+                    interface = I2C()
+                    interface.init_i2c(row["address"])
+                    strategy = I2CStrategy(interface)
                     listed_devices.append(device)
 
                 if int(row["interface_type"]) == 2:
                     print(row["name"])
-                    device.interface.init_socket(row["address"], int(row["setting"])) # Address and setting are here the ip_address and the portnumber of the target device.
+                    interface = Ethernet()
+                    interface.init_socket(row["address"], int(row["setting"])) # Address and setting are here the ip_address and the portnumber of the target device.
+                    strategy = EthernetStrategy(interface)
                     listed_devices.append(device)
 
                 if int(row["interface_type"]) == 3:
                     print(row["name"])
-                    device.interface.init_spi(int(row["address"]), int(row["setting"]))
+                    interface = SPI()
+                    interface.init_spi(row["address"], int(row["setting"]))
+                    strategy = SPIStrategy(interface)
                     listed_devices.append(device)
-                    
+                
+                device.set_strategy(strategy)
+               
                 line_count += 1
             print(f'Processed {line_count} lines.')
 
