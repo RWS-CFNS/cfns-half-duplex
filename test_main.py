@@ -1,13 +1,13 @@
-from test_wifi import WifiConfirmTester
-from test_half_duplex import MyTestCase
+# from test_wifi import WifiConfirmTester
+# from test_half_duplex import MyTestCase
 from test_choosing_devices import ChoosingDevicesTester
 
 import unittest
 
 def main():
-    test_classes = [WifiConfirmTester(), MyTestCase(), ChoosingDevicesTester()]
+    test_classes = [ChoosingDevicesTester()]
     function_names_of_test_classes = {test_class:get_function_names_startwith_test(test_class) for test_class in test_classes}
-
+    print("test")
     test_name = input("Welke test wilt u uitvoeren? ")
     test_suite = get_test_suite(test_name, function_names_of_test_classes)
     

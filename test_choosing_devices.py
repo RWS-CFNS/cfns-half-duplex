@@ -3,7 +3,7 @@ import main
 from Devices.Strategy import AISStrategy, EthernetStrategy, I2CStrategy
 
 class ChoosingDevicesTester(unittest.TestCase):
-    def __init__(self):
+    def setUp(self):
         self.test_monitor = main.Monitor("folder")
     
     def has_reach_for_devices(self):
