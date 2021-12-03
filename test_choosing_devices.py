@@ -7,7 +7,7 @@ class ChoosingDevicesTester(unittest.TestCase):
         self.test_monitor = main.Monitor("folder")
     
     def has_reach_for_devices(self):
-        test_device = self.test_monitor.attach_devices("csv_test_files/test_devices1.csv")[0]
+        test_device = main.attach_devices("csv_test_files/test_devices1.csv")[0]
         results = []
 
         # Test has_reach of Wifi
