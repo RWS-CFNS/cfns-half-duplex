@@ -36,6 +36,7 @@ class WifiConfirmTester(unittest.TestCase):
         test_folder = Folder("./correct")
         test_monitor = Monitor(test_folder)
         test_monitor.devices = attach_devices("devices.csv") # Fills the list of devices with one device so choose device is not necessary
+        test_device = test_monitor.devices[0]
 
         # Fill the folder with test files 
         test_file1 = File("test1")
@@ -58,14 +59,14 @@ class WifiConfirmTester(unittest.TestCase):
         # Here the tests will be executed and determined if they were a succes or not
         expected_result = Status.CONFIRMED
 
-        test_monitor.acknowledge(data1)
+        test_monitor.acknowledge(data1, test_device)
         file1_after_test = test_monitor.folder.find_file_by_dab_id(test_file1.get_dab_id())
         self.assertEqual(file1_after_test.get_status(), expected_result)
 
-        test_monitor.acknowledge(data2)
+        test_monitor.acknowledge(data2, test_device)
         file2_after_test = test_monitor.folder.find_file_by_dab_id(test_file2.get_dab_id())
         self.assertEqual(file2_after_test.get_status(), expected_result)
 
-        test_monitor.acknowledge(data3)
+        test_monitor.acknowledge(data3, test_device)
         file3_after_test = test_monitor.folder.find_file_by_dab_id(test_file3.get_dab_id())
         self.assertEqual(file3_after_test.get_status(), expected_result)
