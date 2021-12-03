@@ -95,6 +95,27 @@ class Monitor(PatternMatchingEventHandler):
             # Start the acknowledgment
             self.acknowledge(data, devices)
 
+    
+    def filter_devices_on_reach(self):
+        """
+        This method splits one list in two list, because there are two different process of acknowledging a message. 
+        Which method needs to be used depends on wheter the device has reach or not.
+        """
+
+        # Initialize the lists to fill with the correct devices
+        devices_have_reach = []
+        no_has_reach_devices = []
+
+        # Fill the lists with the correct devices
+        for device in self.devices: 
+            has_reach = device.has_reach()
+            if has_reach:
+                devices_have_reach.append(device)  
+            elif has_reach == None:
+                no_has_reach_devices.append(device)
+
+        return devices_have_reach, no_has_reach_devices
+
     """
         This method chooses the best device based on the reach the technology of the device has, the specifics of the used technology and the availability of the device. 
         To choose the device that fits best for the current situation
@@ -104,24 +125,15 @@ class Monitor(PatternMatchingEventHandler):
         if not self.devices:
             return False
 
-        # Initialize the lists to fill with the correct devices
-        devices_have_reach = []
-        devices_not_able_to_calc_reach = []
+        # split devices in two list wheter they have reach or not
+        devices_have_reach, no_has_reach_devices = self.filter_devices_on_reach()
 
-        # Fill the lists with the correct devices
-        for device in self.devices: 
-            has_reach = device.has_reach()
-            if has_reach:
-                devices_have_reach.append(device)  
-            elif has_reach == None:
-                devices_not_able_to_calc_reach.append(device)
-
+        # Find the device with the highest priority. Highest priority is the lowest device.priority value
         if devices_have_reach:
-            # Find the device with the highest priority. Highest priority is the lowest device.priority value
             return [min(devices_have_reach, key= lambda device: device.priority)]
-        elif devices_not_able_to_calc_reach:
+        elif no_has_reach_devices:
             # Choose all the possible devices
-            return devices_not_able_to_calc_reach
+            return no_has_reach_devices
         else: 
             # If there is no device within reach or no device in devices_not_able_to_calc_reach. return False
             return False

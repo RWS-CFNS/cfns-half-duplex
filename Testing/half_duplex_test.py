@@ -19,7 +19,6 @@
 #    along with cfns-half-duplex. If not, see <https://www.gnu.org/licenses/>.
 #
 
-import time
 import unittest
 from Devices.Strategy import AISStrategy, I2CStrategy
 
@@ -30,14 +29,14 @@ from Devices.Device import Device
 from Interface import Interface
 from main import Monitor, attach_devices
 
-from Status import Status
-
 ''''
 project: Half-Duplex
-author: Alfred Espinosa Encarnación, Frank Montenij
+author: Alfred Espinosa Encarnación
 date: 30-03-2021, 11-11-2021
 
-Description: Testing method to test the functionalities of Half-Duplex. The class MyTestCase has been written by Alfred. Frank Wrote the class WifiConfirmTester
+Description: Testing method to test the functionalities of Half-Duplex. The class MyTestCase has been written by Alfred.
+
+WERKT NIET MEER!
 '''
 
 class MyTestCase(unittest.TestCase):
@@ -152,100 +151,6 @@ class MyTestCase(unittest.TestCase):
         main.attach_devices("devices.csv")
         #test_monitor.acknowledge(67, 1)
 
-class WifiConfirmTester(unittest.TestCase):
-    def test_updating_file(self):
-        """Testcase to test if Folder can update fields in a File"""
 
-        # Prepare the test
-        test_folder = Folder("./correct")
-        test_file = File("test")
-        test_folder.files = [test_file]
 
-        # Test if a folder can update the valid field in a file 
-        expected_result = False
-        test_folder.update_confirmed_in_file(test_file.get_dab_id(), valid=False)    
-        result = test_file.get_valid()
-        self.assertEqual(result, expected_result)
 
-        # Test if a folder can update the status field in a file 
-        expected_result = Status.CONFIRMED
-        test_folder.update_confirmed_in_file(test_file.get_dab_id(), status=Status.CONFIRMED)    
-        result = test_file.get_status()
-        self.assertEqual(result, expected_result)
-
-    def test_acknowledge_wifi(self):
-        """Testcase to test if the Half-Duplex system in the current state can confirm a message using Wifi"""
-        
-        # Prepare the monitor
-        test_folder = Folder("./correct")
-        test_monitor = Monitor(test_folder)
-        test_monitor.devices = attach_devices("devices.csv") 
-
-        # Fill the folder with test files 
-        test_file1 = File("test1")
-        test_file1.dab_id = 67
-        test_file1.message_type = 4
-        test_file2 = File("test2")
-        test_file2.dab_id = 100
-        test_file2.message_type = 2
-        test_file3 = File("test3")
-        test_file3.dab_id = 6
-        test_file3.message_type = 1
-        test_monitor.folder.files = [test_file1, test_file2, test_file3]
-
-        # Create the data to send
-        time_of_arrival = time.time()
-        data1 = test_monitor.create_confirmation_dict(test_file1.get_dab_id(), test_file1.get_message_type(), time_of_arrival)
-        data2 = test_monitor.create_confirmation_dict(test_file2.get_dab_id(), test_file2.get_message_type(), time_of_arrival)
-        data3 = test_monitor.create_confirmation_dict(test_file3.get_dab_id(), test_file3.get_message_type(), time_of_arrival)
-
-        # Here the tests will be executed and determined if they were a succes or not
-        expected_result = Status.CONFIRMED
-
-        test_monitor.acknowledge(data1)
-        file1_after_test = test_monitor.folder.find_file_by_dab_id(test_file1.get_dab_id())
-        self.assertEqual(file1_after_test.get_status(), expected_result)
-
-        test_monitor.acknowledge(data2)
-        file2_after_test = test_monitor.folder.find_file_by_dab_id(test_file2.get_dab_id())
-        self.assertEqual(file2_after_test.get_status(), expected_result)
-
-        test_monitor.acknowledge(data3)
-        file3_after_test = test_monitor.folder.find_file_by_dab_id(test_file3.get_dab_id())
-        self.assertEqual(file3_after_test.get_status(), expected_result)
-
-def main():
-    tester = WifiConfirmTester()
-
-    test_name = input("Welke test wilt u uitvoeren? ")
-    test_suite = get_test_suite(test_name, tester)
-
-    unittest.TextTestRunner(verbosity=2).run(test_suite)
-
-"""
-    This function loops through all the attributes of get_function_names_startwith_test if the attribute is a function of _class append the function_name to function_names.
-    After that filter the function names that start with "test". now you have a list of the function names that start with "test" and belong to _class.
-"""
-def get_function_names_startwith_test(_class):
-    import types
-
-    functionNames = []
-    for entry, value in _class.__class__.__dict__.items():
-        if (isinstance(value, types.FunctionType)):
-            functionNames.append(entry)
-    
-    return [function_name for function_name in functionNames if function_name.startswith("test")]
-
-def get_test_suite(test_name, tester_class):
-    function_names = get_function_names_startwith_test(tester_class)
-
-    suite = unittest.TestSuite()
-    if test_name in function_names:
-        suite.addTest(tester_class.__class__(test_name))
-    else:
-        print("test_name not a test function in the test_class")
-
-    return suite
-
-if __name__ == '__main__':
-    main()
