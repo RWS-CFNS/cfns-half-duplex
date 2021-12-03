@@ -16,13 +16,13 @@ class WifiConfirmTester(unittest.TestCase):
 
         # Test if a folder can update the valid field in a file 
         expected_result = False
-        test_folder.update_confirmed_in_file(test_file.get_dab_id(), valid=False)    
+        test_folder.update_file(test_file.get_dab_id(), valid=False)    
         result = test_file.get_valid()
         self.assertEqual(result, expected_result)
 
         # Test if a folder can update the status field in a file 
         expected_result = Status.CONFIRMED
-        test_folder.update_confirmed_in_file(test_file.get_dab_id(), status=Status.CONFIRMED)    
+        test_folder.update_file(test_file.get_dab_id(), status=Status.CONFIRMED)    
         result = test_file.get_status()
         self.assertEqual(result, expected_result)
 
