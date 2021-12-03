@@ -13,7 +13,7 @@ class ChoosingDevicesTester(unittest.TestCase):
         # Test has_reach of Wifi
         test_device.set_technology("Wifi")
         result = test_device.has_reach()
-        self.append(result)
+        results.append(result)
 
         # Test has_reach of LoRa (on the FiPy)
         # test_device_fipy.set_technology("LoRa")
@@ -23,7 +23,7 @@ class ChoosingDevicesTester(unittest.TestCase):
         # Test has_reach of LTE
         test_device.set_technology("LTE")
         result = test_device.has_reach()
-        self.append(result)
+        results.append(result)
 
         # Test has_reach LoRa (on the Sodaq One)
         # test_device = test_monitor.attach_device("csv_test_files/test_devices1.csv")[1]
