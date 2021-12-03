@@ -1,5 +1,5 @@
-from wifi_test import WifiConfirmTester
-from half_duplex_test import MyTestCase
+from test_wifi import WifiConfirmTester
+from test_half_duplex import MyTestCase
 
 import unittest
 
