@@ -1,2 +1,2 @@
 name,branch,model,interface_type,address,setting,technology,priority
-AIS Base Station,True Heading,Carbon Pro,0,/dev/ttyusb0,38400,AIS,0
+AIS Base Station,True Heading,Carbon Pro,0,/dev/ttyACM0,38400,AIS,0
