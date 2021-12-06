@@ -78,36 +78,61 @@ class ChoosingDevicesTester(unittest.TestCase):
     def test_choose_device(self):
         # Test if choose device can choose the device that has priority one.
         self.test_monitor.devices = main.attach_devices("csv_test_files/test_devices1.csv")
-        expected_device = self.test_monitor.devices[0]
-        self.assertEqual(expected_device.strategy, EthernetStrategy)
-        self.assertEqual(expected_device.technology, "Wifi")
-        
-        result_device = self.test_monitor.choose_device()[0]
+        devices_have_reach = self.test_monitor.devices
+        result_device = self.test_monitor.choose_device(devices_have_reach=devices_have_reach, no_has_reach_devices=[])[0]
         self.assertEqual(result_device.strategy, EthernetStrategy)
         self.assertEqual(result_device.technology, "Wifi")
 
         # Test if choose device can choose the highest priority device when the device with priority one is not present.
         self.test_monitor.devices = main.attach_devices("csv_test_files/test_devices2.csv")
-        expected_device = self.test_monitor.devices[0]
-        self.assertEqual(expected_device.strategy, I2CStrategy)
-        self.assertEqual(expected_device.technology, "LoRa")
-        
-        result_device = self.test_monitor.choose_device()[0]
+        devices_have_reach = self.test_monitor.devices
+        result_device = self.test_monitor.choose_device(devices_have_reach=devices_have_reach, no_has_reach_devices=[])[0]
         self.assertEqual(result_device.strategy, I2CStrategy)
         self.assertEqual(result_device.technology, "LoRa")
         
         # Test if choose device can choose the device(s) that cannot determine if they are within reach.
         self.test_monitor.devices = main.attach_devices("csv_test_files/test_devices3.csv")
-        expected_device = self.test_monitor.devices[0]
-        self.assertEqual(expected_device.strategy, AISStrategy)
-        self.assertEqual(expected_device.technology, "AIS")
-        
-        result_device = self.test_monitor.choose_device()[0]
+        no_has_reach_devices = self.test_monitor.devices
+        result_device = self.test_monitor.choose_device(devices_have_reach=[], no_has_reach_devices=no_has_reach_devices)[0]
         self.assertEqual(result_device.strategy, AISStrategy)
         self.assertEqual(result_device.technology, "AIS")
 
         # test if choose device can detect that there is no device available and returns False.
-        self.test_monitor.devices = main.attach_devices("csv_test_files/test_devices4.csv")
         expected_result = False
-        result = self.test_monitor.choose_device()
+        result = self.test_monitor.choose_device(devices_have_reach=[], no_has_reach_devices=[])
         self.assertEqual(result, expected_result)
+
+    def test_system_choosing_device(self):
+        # Test if the system choosing devices works when the device with priority one is available.
+        self.test_monitor.devices = main.attach_devices("csv_test_files/test_devices1.csv")
+        devices_have_reach, no_has_reach_devices = self.test_monitor.filter_devices_on_reach()
+
+        result_device = self.test_monitor.choose_device(devices_have_reach, no_has_reach_devices)[0]
+    	self.assertEqual(result_device.strategy, EthernetStrategy)
+        self.assertEqual(result_device.technology, "Wifi")
+
+        # Test if the system choosing devices works when the device with priority one is not available. Is it capable of choosing the best from the rest.
+        self.test_monitor.devices = main.attach_devices("csv_test_files/test_devices2.csv")
+        devices_have_reach, no_has_reach_devices = self.test_monitor.filter_devices_on_reach()
+
+        result_device = self.test_monitor.choose_device(devices_have_reach, no_has_reach_devices)[0]
+    	self.assertEqual(result_device.strategy, I2CStrategy)
+        self.assertEqual(result_device.technology, "LoRa")
+
+
+        # Test if the system choosing devices works when only AIS is available. So a tech which cannot determine if it is within reach.
+        self.test_monitor.devices = main.attach_devices("csv_test_files/test_devices1.csv")
+        devices_have_reach, no_has_reach_devices = self.test_monitor.filter_devices_on_reach()
+
+        result_device = self.test_monitor.choose_device(devices_have_reach, no_has_reach_devices)[0]
+    	self.assertEqual(result_device.strategy, AISStrategy)
+        self.assertEqual(result_device.technology, "AIS")
+
+        # Test if the system choosing devices works when there are no devices available. It should return False.
+        self.test_monitor.devices = []
+        devices_have_reach, no_has_reach_devices = self.test_monitor.filter_devices_on_reach()
+
+        result_device = self.test_monitor.choose_device(devices_have_reach, no_has_reach_devices)[0]
+    	self.assertFalse(result_device)
+
+
