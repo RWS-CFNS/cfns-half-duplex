@@ -68,13 +68,6 @@ class ChoosingDevicesTester(unittest.TestCase):
         self.assertEqual(result, expected_device)
         self.assertEqual(no_has_reach_devices, [])
 
-    def test_no_devices_available(self):
-        # Make sure devices is empty!
-        self.assertEqual(self.test_monitor.devices, [])
-
-        # Test if choose devices returns False when there are no devices available
-        self.assertFalse(self.test_monitor.choose_device())
-
     def test_choose_device(self):
         # Test if choose device can choose the device that has priority one.
         self.test_monitor.devices = main.attach_devices("csv_test_files/test_devices1.csv")
@@ -132,7 +125,7 @@ class ChoosingDevicesTester(unittest.TestCase):
         self.test_monitor.devices = []
         devices_have_reach, no_has_reach_devices = self.test_monitor.filter_devices_on_reach()
 
-        result_device = self.test_monitor.choose_device(devices_have_reach, no_has_reach_devices)[0]
+        result_device = self.test_monitor.choose_device(devices_have_reach, no_has_reach_devices)
         self.assertFalse(result_device)
 
 

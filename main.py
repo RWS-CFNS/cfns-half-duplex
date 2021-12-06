@@ -138,7 +138,7 @@ class Monitor(PatternMatchingEventHandler):
             return no_has_reach_devices
         else: 
             # If there is no device within reach or no device in devices_not_able_to_calc_reach. return False
-            return [False]
+            return False
 
     """
         This method is responsible for acknowledging the DAB file with all the available devices.
