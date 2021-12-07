@@ -29,12 +29,12 @@ class ChoosingDevicesTester(unittest.TestCase):
         # test_device = main.attach_devices("csv_test_files/test_devices1.csv")[3]
         # test_device.set_technology("LoRa")
         # result = test_device.has_reach()
-        # self.append(result)
+        # results.append(result)
 
         # Test has_reach AIS
         test_device = main.attach_devices("csv_test_files/test_devices1.csv")[4]
         result = test_device.has_reach()
-        self.append(result)
+        results.append(result)
 
         return results
 
