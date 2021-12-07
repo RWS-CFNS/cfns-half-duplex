@@ -7,43 +7,52 @@ class ChoosingDevicesTester(unittest.TestCase):
         self.test_monitor = main.Monitor("folder")
 
     def has_reach_for_devices(self):
-        test_device = main.attach_devices("csv_test_files/test_devices1.csv")[0]
+        
         results = []
 
         # Test has_reach of Wifi
-        test_device.set_technology("Wifi")
+        test_device = main.attach_devices("csv_test_files/test_devices1.csv")[0]
         result = test_device.has_reach()
         results.append(result)
 
-        # Test has_reach of LoRa (on the FiPy)
-        # test_device_fipy.set_technology("LoRa")
-        # result = test_device_fipy.has_reach()
-        # self.append(result)
+         # Test has_reach of LoRa (FiPy)
+        test_device = main.attach_devices("csv_test_files/test_devices1.csv")[1]
+        result = test_device.has_reach()
+        results.append(result)
 
         # Test has_reach of LTE
-        test_device.set_technology("LTE")
+        test_device = main.attach_devices("csv_test_files/test_devices1.csv")[2]
         result = test_device.has_reach()
         results.append(result)
 
         # Test has_reach LoRa (on the Sodaq One)
-        # test_device = test_monitor.attach_device("csv_test_files/test_devices1.csv")[1]
+        # test_device = main.attach_devices("csv_test_files/test_devices1.csv")[3]
         # test_device.set_technology("LoRa")
         # result = test_device.has_reach()
         # self.append(result)
+
+        # Test has_reach AIS
+        test_device = main.attach_devices("csv_test_files/test_devices1.csv")[4]
+        result = test_device.has_reach()
+        self.append(result)
 
         return results
 
     def test_has_reach(self):
         results = self.has_reach_for_devices()
+        AIS_result = results.pop(len(results) - 1)
 
         for result in results:
             self.assertEqual(result, True)
+        self.assertEqual(AIS_result, None)
 
     def test_failed_has_reach(self):
         results = self.has_reach_for_devices()
+        AIS_result = results.pop(len(results) - 1)
 
         for result in results:
             self.assertNotEqual(result, True)
+        self.assertEqual(AIS_result, None)
 
     def test_filter_devices_on_reach(self):
         # "test_devices1.csv" contains a device that can not determine if they have reach.
@@ -95,7 +104,7 @@ class ChoosingDevicesTester(unittest.TestCase):
         result = self.test_monitor.choose_device(devices_have_reach=[], no_has_reach_devices=[])
         self.assertEqual(result, expected_result)
 
-    def test_system_choosing_device(self):
+    def test_system_choose_device(self):
         # Test if the system choosing devices works when the device with priority one is available.
         self.test_monitor.devices = main.attach_devices("csv_test_files/test_devices1.csv")
         devices_have_reach, no_has_reach_devices = self.test_monitor.filter_devices_on_reach()
@@ -107,11 +116,10 @@ class ChoosingDevicesTester(unittest.TestCase):
         # Test if the system choosing devices works when the device with priority one is not available. Is it capable of choosing the best from the rest.
         self.test_monitor.devices = main.attach_devices("csv_test_files/test_devices2.csv")
         devices_have_reach, no_has_reach_devices = self.test_monitor.filter_devices_on_reach()
-
+ 
         result_device = self.test_monitor.choose_device(devices_have_reach, no_has_reach_devices)[0]
         self.assertTrue(isinstance(result_device.strategy, I2CStrategy))
         self.assertEqual(result_device.technology, "LoRa")
-
 
         # Test if the system choosing devices works when only AIS is available. So a tech which cannot determine if it is within reach.
         self.test_monitor.devices = main.attach_devices("csv_test_files/test_devices1.csv")
