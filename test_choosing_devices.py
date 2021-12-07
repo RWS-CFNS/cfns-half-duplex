@@ -15,21 +15,21 @@ class ChoosingDevicesTester(unittest.TestCase):
         result = test_device.has_reach()
         results.append(result)
 
-        # # Test has_reach of LoRa (FiPy)
+        # Test has_reach of LoRa (FiPy)
         # test_device = main.attach_devices("csv_test_files/test_devices1.csv")[1]
         # result = test_device.has_reach()
         # results.append(result)
 
-        # Test has_reach of LTE
-        test_device = main.attach_devices("csv_test_files/test_devices1.csv")[2]
-        result = test_device.has_reach()
-        results.append(result)
-
         # Test has_reach LoRa (on the Sodaq One)
-        # test_device = main.attach_devices("csv_test_files/test_devices1.csv")[3]
+        # test_device = main.attach_devices("csv_test_files/test_devices1.csv")[2]
         # test_device.set_technology("LoRa")
         # result = test_device.has_reach()
         # results.append(result)
+
+        # Test has_reach of LTE
+        test_device = main.attach_devices("csv_test_files/test_devices1.csv")[3]
+        result = test_device.has_reach()
+        results.append(result)
 
         # Test has_reach AIS
         test_device = main.attach_devices("csv_test_files/test_devices1.csv")[4]
