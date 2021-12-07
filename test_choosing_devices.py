@@ -15,10 +15,10 @@ class ChoosingDevicesTester(unittest.TestCase):
         result = test_device.has_reach()
         results.append(result)
 
-         # Test has_reach of LoRa (FiPy)
-        test_device = main.attach_devices("csv_test_files/test_devices1.csv")[1]
-        result = test_device.has_reach()
-        results.append(result)
+        # # Test has_reach of LoRa (FiPy)
+        # test_device = main.attach_devices("csv_test_files/test_devices1.csv")[1]
+        # result = test_device.has_reach()
+        # results.append(result)
 
         # Test has_reach of LTE
         test_device = main.attach_devices("csv_test_files/test_devices1.csv")[2]
