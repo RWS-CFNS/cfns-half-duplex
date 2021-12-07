@@ -118,8 +118,8 @@ class ChoosingDevicesTester(unittest.TestCase):
         devices_have_reach, no_has_reach_devices = self.test_monitor.filter_devices_on_reach()
  
         result_device = self.test_monitor.choose_device(devices_have_reach, no_has_reach_devices)[0]
-        self.assertTrue(isinstance(result_device.strategy, I2CStrategy))
-        self.assertEqual(result_device.technology, "LoRa")
+        self.assertTrue(isinstance(result_device.strategy, EthernetStrategy))
+        self.assertEqual(result_device.technology, "LTE")
 
         # Test if the system choosing devices works when only AIS is available. So a tech which cannot determine if it is within reach.
         self.test_monitor.devices = main.attach_devices("csv_test_files/test_devices1.csv")
