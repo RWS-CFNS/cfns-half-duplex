@@ -35,7 +35,7 @@ class RetryingAckTester(unittest.TestCase):
                 
                 self.assertEqual(file.get_status(), Status.CONFIRMED)
             elif file.dab_id in [2, 3, 5]:
-                self.assertEqual(file.get_status, Status(file.dab_id))
+                self.assertEqual(file.get_status(), Status(file.dab_id))
             elif file.dab_id == 4:
                 self.assertEqual(file.get_status(), Status.UNCONFIRMED)
             else:
