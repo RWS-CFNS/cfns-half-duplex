@@ -11,7 +11,7 @@ class RetryingAckTester(unittest.TestCase):
         status = Status.UNCONFIRMED
 
         # Fill the folder with files with each of them having a different status
-        for number in range(len(Status)):
+        for number in range(1, len(Status) + 1):
             # Create the File itself and change the attributes to distinguish the files from each other.
             file_to_add = File(f"test{number}")
             file_to_add.dab_id = number
@@ -29,7 +29,7 @@ class RetryingAckTester(unittest.TestCase):
         self.test_monitor.retry_failed_confirmation()
 
         for file in self.test_monitor.folder.files:
-            if file.dab_id == 0:
+            if file.dab_id == 1:
                 # Based on the time it takes to confirm a message with wifi
                 time.sleep(3)
                 
