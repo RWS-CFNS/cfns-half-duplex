@@ -1,3 +1,4 @@
+import time
 import unittest
 from Folder import Folder
 from File import File
@@ -29,6 +30,9 @@ class RetryingAckTester(unittest.TestCase):
 
         for file in self.test_monitor.folder.files:
             if file.dab_id == 0:
+                # Based on the time it takes to confirm a message with wifi
+                time.sleep(3)
+                
                 self.assertEqual(file.get_status(), Status.CONFIRMED)
             elif file.dab_id in [2, 3, 5]:
                 self.assertEqual(file.get_status, Status(file.dab_id))

@@ -195,6 +195,12 @@ class Monitor(PatternMatchingEventHandler):
     def retry_failed_confirmation(self):
         for file in self.folder.files:
             if file.get_status() == Status.UNCONFIRMED:
+                """
+                    Change status to CONFIRMING. 
+                    So if the loop goes faster than the acknowledgment it wont reacknowledge it again
+                """
+                file.set_status(Status.CONFIRMING)
+                
                 # Build the confirmation dict which contains all the necessary information to acknowledge a DAB messsage
                 data = self.create_confirmation_dict(file.get_dab_id(), file.get_message_type(), file.get_time_of_arrival())
                 
