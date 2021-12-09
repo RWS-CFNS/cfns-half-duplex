@@ -24,7 +24,7 @@ class RetryingAckTester(unittest.TestCase):
             self.test_monitor.folder.files.append(file_to_add)
 
     def test_retrying_ack(self):
-        self.test_monitor.devices = main.attach_devices("csv_test_files/test_devices1.csv")
+        self.test_monitor.devices_csv_filename = "csv_test_files/test_devices1.csv"
         self.test_monitor.retry_failed_confirmation()
 
         for file in self.test_monitor.folder.files:
@@ -36,7 +36,7 @@ class RetryingAckTester(unittest.TestCase):
                 self.assertEqual(file.get_status(), Status.UNCONFIRMED)
             else:
                 raise NotImplementedError(f"There is not test defined for a file with dab_id: {file.dab_id}")
-                
+
 
         
         
