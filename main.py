@@ -127,11 +127,11 @@ class Monitor(PatternMatchingEventHandler):
         To choose the device that fits best for the current situation
     """
     def choose_device(self):
+        # Load the available devices
+        self.devices = attach_devices(self.devices_csv_filename)
+
         if not self.devices:
             return []
-
-        # Choose the best possible device or devices if the reach of the device can not be determined
-        self.devices = attach_devices(self.devices_csv_filename)
 
         # split devices in two list wheter they have reach or not
         devices_have_reach, no_has_reach_devices = self.filter_devices_on_reach()
