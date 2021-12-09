@@ -35,7 +35,9 @@ class WifiConfirmTester(unittest.TestCase):
         # Prepare the monitor
         test_folder = Folder("./correct")
         test_monitor = Monitor(test_folder)
-        test_monitor.devices = attach_devices("devices.csv") # Fills the list of devices with one device so choose device is not necessary
+        
+        # Fills the list of devices with one device so choose device is not necessary
+        test_monitor.devices = attach_devices("devices.csv") 
         test_device_list = test_monitor.devices
 
         # Fill the folder with test files 

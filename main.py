@@ -3,6 +3,7 @@ import sys
 import argparse
 import csv
 import threading
+
 from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler
 
@@ -83,12 +84,8 @@ class Monitor(PatternMatchingEventHandler):
         # Build the confirmation dict which contains all the necessary information to acknowledge a DAB messsage
         data = self.create_confirmation_dict(dab_id, message_type, time_of_arrival)
         
-        # Choose the best possible device or devices if the reach of the device can not be determined
-        self.devices = attach_devices(self.devices_csv_filename)
-
-        # split devices in two list wheter they have reach or not
-        devices_have_reach, no_has_reach_devices = self.filter_devices_on_reach()
-        devices = self.choose_device(devices_have_reach, no_has_reach_devices)
+        
+        devices = self.choose_device()
 
         # If there is no device available. Abort the acknowledgment
         if not devices:
@@ -98,13 +95,11 @@ class Monitor(PatternMatchingEventHandler):
             # Start the acknowledgment
             self.acknowledge(data, devices)
 
-    
-    def filter_devices_on_reach(self):
-        """
+    """
         This method splits one list in two list, because there are two different process of acknowledging a message. 
         Which method needs to be used depends on wheter the device has reach or not.
         """
-
+    def filter_devices_on_reach(self):
         # Initialize the lists to fill with the correct devices
         devices_have_reach = []
         no_has_reach_devices = []
@@ -122,26 +117,40 @@ class Monitor(PatternMatchingEventHandler):
         return devices_have_reach, no_has_reach_devices
 
     """
+        This method retrieves the device with the highest priority. Which means the lowest self.priority from a list of devices
+    """
+    def get_highest_priority_device(devices):
+        return min(devices, key= lambda device: device.priority)
+
+    """
         This method chooses the best device based on the reach the technology of the device has, the specifics of the used technology and the availability of the device. 
         To choose the device that fits best for the current situation
     """
-    def choose_device(self, devices_have_reach, no_has_reach_devices):
-        # Check if devices is empty 
+    def choose_device(self):
         if not self.devices:
-            return False
+            return []
+
+        # Choose the best possible device or devices if the reach of the device can not be determined
+        self.devices = attach_devices(self.devices_csv_filename)
+
+        # split devices in two list wheter they have reach or not
+        devices_have_reach, no_has_reach_devices = self.filter_devices_on_reach()
 
         # Find the device with the highest priority. Highest priority is the lowest device.priority value
         if devices_have_reach:
-            return [min(devices_have_reach, key= lambda device: device.priority)]
+            try:
+                return [self.get_highest_priority_device(devices_have_reach)]
+            except ValueError:
+                return []
         elif no_has_reach_devices:
             # Choose all the possible devices
             return no_has_reach_devices
         else: 
             # If there is no device within reach or no device in devices_not_able_to_calc_reach. return False
-            return False
+            return []
 
     """
-        This method is responsible for acknowledging the DAB file with all the available devices.
+        This method is responsible for acknowledging the DAB file with all the best device available. Can be one or multiple devices.
     """
     def acknowledge(self, data, devices):
         for device in devices:
@@ -178,10 +187,10 @@ class Monitor(PatternMatchingEventHandler):
                 new_status = Status.CONFIRMATION_SENT if reply else Status.SKIP
                 self.folder.update_file(data.get("dab_id"), status=new_status)
 
-            # print the status for every file
-            print("\nStatus of files (dab_id, file status")
-            for file in self.folder.files:
-                print(file.get_dab_id(), file.get_status())
+        # print the status for every file
+        print("\nStatus of files (dab_id, file status")
+        for file in self.folder.files:
+            print(file.get_dab_id(), file.get_status())
 
     def retry_failed_confirmation(self):
         for file in self.folder.files:
@@ -189,16 +198,13 @@ class Monitor(PatternMatchingEventHandler):
                 # Build the confirmation dict which contains all the necessary information to acknowledge a DAB messsage
                 data = self.create_confirmation_dict(file.get_dab_id(), file.get_message_type(), file.get_time_of_arrival())
                 
-                # Choose the best possible device or devices if the reach of the device can not be determined
-                self.devices = attach_devices(self.devices_csv_filename)
-
-                # split devices in two list wheter they have reach or not
-                devices_have_reach, no_has_reach_devices = self.filter_devices_on_reach()
-                devices = self.choose_device(devices_have_reach, no_has_reach_devices)
+                # Get the device or devices to use
+                devices = self.choose_device()
 
                 thread = threading.Thread(target=self.acknowledge, args=(data, devices))
                 thread.start()
             elif file.get_status() == Status.SKIP:
+                # Skip ones acknowledge the message the next time you come along.
                 file.set_status(Status.UNCONFIRMED)
 
 """
@@ -258,28 +264,24 @@ def attach_devices(csv_parameter):
                     
                 device = Device(row["name"], row["branch"], row["model"], row["technology"], int(row["priority"]))
                 if int(row["interface_type"]) == 0:
-                    print(row["name"])
                     interface = UART()
                     interface.init_serial(row["address"], int(row["setting"]))
                     strategy = AISStrategy(interface)
                     listed_devices.append(device)
 
                 if int(row["interface_type"]) == 1:
-                    print(row["name"])
                     interface = I2C()
                     interface.init_i2c(int(row["address"]))
                     strategy = I2CStrategy(interface)
                     listed_devices.append(device)
 
                 if int(row["interface_type"]) == 2:
-                    print(row["name"])
                     interface = Ethernet()
                     interface.init_socket(row["address"], int(row["setting"])) # Address and setting are here the ip_address and the portnumber of the target device.
                     strategy = EthernetStrategy(interface)
                     listed_devices.append(device)
 
                 if int(row["interface_type"]) == 3:
-                    print(row["name"])
                     interface = SPI()
                     interface.init_spi(int(row["address"]), int(row["setting"]))
                     strategy = SPIStrategy(interface)

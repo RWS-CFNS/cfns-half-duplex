@@ -3,6 +3,7 @@ from aisutils import BitVector
 from aisutils import binary
 
 from abc import ABC, abstractmethod
+import time
 
 class Strategy(ABC):
     def __init__(self, interface):
@@ -10,10 +11,10 @@ class Strategy(ABC):
 
     @abstractmethod
     def communicate(self, data) -> bool:
-        """Subclasses need to implement this method. It must returns a bool value """
+        """Subclasses need to implement this method. It must returns a bool value."""
 
 class I2CStrategy(Strategy):
-    """Class to define how to communcicate with a I2C interface."""
+    """Class to define how to communcicate with an I2C interface."""
     
     def __init__(self, interface):
         super().__init__(interface)
@@ -32,9 +33,14 @@ class I2CStrategy(Strategy):
             
             self.interface.write(data_list)
 
-            if len(data_list) == 1 and data_list[0] == 1: # Has_reach reply
+            if len(data_list) == 1 and data_list[0] == 1: 
+                # Has_reach reply
+                # Sleep for 10 seconds, because getting reach can take up to 10 seconds.
+                time.sleep(10)
+
                 reply = self.interface.read_i2c(self.amount_of_bytes_to_read)[0]
-            else: # DAB confirmation reply
+            else: 
+                # DAB confirmation reply
                 reply = self.interface.read_i2c(self.amount_of_bytes_to_read)[1]
             return reply if reply else False 
         except OSError as e:
@@ -44,6 +50,9 @@ class I2CStrategy(Strategy):
             print(e)
             return False
     
+    """
+        Converts data dict to data list. I2C works with byte lists.
+    """
     def data_dict_to_list(self, data):
         if isinstance(data, list):
             return data
@@ -98,6 +107,7 @@ class AISStrategy(Strategy):
             else:
                 msg = '  ACK:' + str(data.get("dab_id")) + ',MSG:' + str(data.get("message_type")) + ''
             
+            # Convert msg string to nmea string
             aisBits = BitVector.BitVector(textstring=msg)
             payloadStr, pad = binary.bitvectoais6(aisBits)  # [0]
             buffer = nmea.bbmEncode(1, 1, 0, 1, 8, payloadStr, pad, appendEOL=False)
@@ -115,7 +125,8 @@ class EthernetStrategy(Strategy):
     
     def communicate(self, data):
         try:
-            max_msg_length = 10 # The value is the amount of bytes the first message will be
+            # This is the max size a message containing the length of the message can be.
+            max_msg_length = 10 
 
             self.interface.init_socket(self.interface.ip_address, self.interface.socket_port)
             with self.interface.sock:

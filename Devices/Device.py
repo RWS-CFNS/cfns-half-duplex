@@ -2,7 +2,10 @@
 from Devices.Strategy import AISStrategy, EthernetStrategy, I2CStrategy
 
 class Device:
-    """A Class to represent the device that is responsible for acknowledging a message."""
+    """
+        A Class to represent the logical version of the physical device.
+        Is used to communicate with the physical device.
+    """
     
     def __init__(self, name, branch, model, technology, priority):
         self.name = name
@@ -19,16 +22,14 @@ class Device:
         print("Confirming DAB message with dab_id: {}".format(data.get("dab_id")))
         return self.strategy.communicate(data)
 
-    """
-        This method tries to determine if the device connected this object is within reach of a receiver.
-        Is implemented for devices using AIS or Ethernet as Interface
-    """
+    """This method tries to determine if the device connected to this object is within reach of a receiver."""
     def has_reach(self):
         # If the technology cannot confirm that there is a receiver in reach. Return None
         if isinstance(self.strategy, AISStrategy):
             return None
         elif isinstance(self.strategy, EthernetStrategy):
-            data = {"has_reach": self.technology} # A dict to ask the fipy if the technology has_reach
+            # The message format for sending a has_reach message using the EthernetStrategy
+            data = {"has_reach": self.technology} 
 
             print(f"Asking for has_reach using the technology: {self.technology}")
             reply = self.strategy.communicate(data)

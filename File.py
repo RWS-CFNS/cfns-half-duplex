@@ -35,9 +35,10 @@ class File:
         self.time_of_arrival = time.time()
 
     def set_lines(self, path):
-        with open(str(path+self.filename), 'rt') as my_file:  # Open lorem.txt for reading text data.
-            for my_line in my_file:  # For each line, stored as myline,
-                self.lines.append(my_line.strip(os.linesep))  # add its contents to mylines without the lineseperator. This works for all operating systems
+        with open(str(path+self.filename), 'rt') as my_file: 
+            for my_line in my_file: 
+                # add the line to lines without the lineseperator in the string. Works for all operating systems
+                self.lines.append(my_line.strip(os.linesep))
 
     """
         This method will extract the data from the lines and put it in the corresponding field.
@@ -47,7 +48,6 @@ class File:
         self.message_type = int(self.lines[1])
 
     def set_status(self, status):
-        # Change status if the new status is of type Status
         if type(status) == type(self.status):
             self.status = status
 
