@@ -119,7 +119,7 @@ class Monitor(PatternMatchingEventHandler):
     """
         This method retrieves the device with the highest priority. Which means the lowest self.priority from a list of devices
     """
-    def get_highest_priority_device(devices):
+    def get_highest_priority_device(self, devices):
         return min(devices, key= lambda device: device.priority)
 
     """
