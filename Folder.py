@@ -19,8 +19,12 @@
 #    along with cfns-half-duplex. If not, see <https://www.gnu.org/licenses/>.
 #
 
+from File import File
+import threading
+
 class Folder:
     def __init__(self, path):
+        self.lock = threading.Lock()
         self.path = path
         self.files = []
 
@@ -40,6 +44,27 @@ class Folder:
             else:
                 continue
         return False
+
+    """
+        Pass along a field and a value to find and return the first file that matches those values.
+    """
+    def find_files_by_field(self, field, value):
+        found_files = []
+
+        # If True field is not an attribute of File, so return False
+        if not field in vars(File("")).keys():
+            return False
+
+        for file in self.files:
+            with self.lock:
+                attributes = vars(file)
+
+            if attributes[field] == value:
+                found_files.append(file)
+            else:
+                continue
+        
+        return found_files
 
     """
         This method takes in keyword arguments and a dab_id. The dab_id is used to find the file this method has to update.

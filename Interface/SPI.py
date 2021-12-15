@@ -19,10 +19,11 @@
 #    along with cfns-half-duplex. If not, see <https://www.gnu.org/licenses/>.
 #
 
+from Interface import Interface
 import spidev # type: ignore this line
 
 
-class SPI:
+class SPI(Interface):
     def __init__(self):
         self.spi = spidev.SpiDev()
         self.spi_bus = 0

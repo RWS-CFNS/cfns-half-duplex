@@ -19,9 +19,11 @@
 #    along with cfns-half-duplex. If not, see <https://www.gnu.org/licenses/>.
 #
 
-from smbus2 import SMBus, i2c_msg # type: ignore this line
+from smbus2 import SMBus, i2c_msg
 
-class I2C:
+from Interface import Interface # type: ignore this line
+
+class I2C(Interface):
     def __init__(self):
         self.target_address = 0
         self.bus = SMBus()

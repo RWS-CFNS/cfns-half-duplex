@@ -1,6 +1,8 @@
 import socket
 import json
 
+from Interface import Interface
+
 """
     pad the var msg_length to the padding size. 
     So that the message containing the msg_length has a fixed size of padding size.
@@ -10,7 +12,7 @@ def pad_msg_length(padding_size, msg_length):
     msg_length += b' ' * (padding_size - len(msg_length))
     return msg_length
 
-class Ethernet:
+class Ethernet(Interface):
     def __init__(self):
         self.ip_address = ""
         self.socket_port = 0

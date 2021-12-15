@@ -21,17 +21,20 @@
 
 import time
 import os
-import Status
+from Status import Status
+from Category import Category
 
 class File:
-    def __init__(self, filename, status=Status.Status.CONFIRMING):
+    def __init__(self, filename, status=Status.CONFIRMING, category=Category.OTHER):
         self.filename = filename
         self.lines = []
         self.dab_id = 0
         self.message_type = 0
+        self.category = category
+        self.coordinates = ()
         self.status = status
         self.valid = True
-        self.retry = False
+        self.sent_to_onboard_systems = False
         self.time_of_arrival = time.time()
 
     def set_lines(self, path):
@@ -46,6 +49,8 @@ class File:
     def set_information(self):
         self.dab_id = int(self.lines[0])
         self.message_type = int(self.lines[1])
+        self.category = Category(self.lines[2])
+        self.coordinates = (float(self.lines[3]), float(self.lines[4]))
 
     def set_status(self, status):
         if type(status) == type(self.status):
@@ -54,17 +59,23 @@ class File:
     def set_valid(self, valid):
         self.valid = valid
 
+    def set_sent_to_onboard_systems(self, sent):
+        self.sent_to_onboard_systems = sent
+
+    def get_lines(self):
+        return self.lines
+
     def get_dab_id(self):
         return self.dab_id
 
     def get_message_type(self):
         return self.message_type
 
-    def get_coordinates(self):
-        return float(self.lines[2]), float(self.lines[3])
+    def get_category(self):
+        return self.category
 
-    def get_lines(self):
-        return self.lines
+    def get_coordinates(self):
+        return self.coordinates 
 
     def get_status(self):
         return self.status
@@ -72,6 +83,9 @@ class File:
     def get_valid(self):
         return self.valid
     
+    def get_sent_to_onboard_systems(self):
+        return self.sent_to_onboard_systems
+
     def get_time_of_arrival(self):
         return self.time_of_arrival
 
