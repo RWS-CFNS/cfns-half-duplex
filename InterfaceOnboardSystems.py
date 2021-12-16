@@ -39,12 +39,12 @@ class InterfaceOnboardSystems(threading.Thread):
             return request
         else:
             return Error.NO_DICT
-
+    
     def send_error(self, conn, error):
         error_message = json.dumps({
             "reply": False,
             "error_message": error.value
-        }).encode()
+        })
 
         self.send_response(conn, error_message)
     
@@ -52,7 +52,7 @@ class InterfaceOnboardSystems(threading.Thread):
         response_length = pad_msg_length(self.max_msg_length, len(response))
 
         conn.send(response_length)
-        conn.send(response)
+        conn.send(response.encode())
 
     def choose_request(self, request_type, category = []):
         if request_type == "newest":
@@ -67,32 +67,45 @@ class InterfaceOnboardSystems(threading.Thread):
     def handle_client(self, conn):
         try:
             message = self.receive_message(conn)
+            print("[Client handler] received message properly!")
         except ClientClosedConnectionError:
-           conn.close()
-           return
+            print("[Client handler] client closed connection before sending the complete message")
+            conn.close()
+            return
         
         # Validates the request. If the request would be invalid it could cause the interface to crash.
         dict_request = self.extract_request(message)
 
         if isinstance(dict_request, Error):
+            print("[Client handler] sent message invalid")
+
             # Send an error message as reply
             self.send_error(conn, dict_request)
             conn.close()
             return
-        
+        print("[Client handler] message is validated properly")
+
         request = self.choose_request(**dict_request)
 
         if isinstance(request, Error):
+            print("[Client handler] request_type not found!")
+
             # Send an error message as reply
             self.send_error(conn, request)
             conn.close()
             return
+        print("[Client handler] found request_type")
         
         information = request.parse()
         response = request.build_response(information)
-
+        
+        print("[Client handler] request parsed")
         self.send_response(conn, response)
+        print("[Client handler] response sent")
+        print("[Client handler] closing connection ... ")
         conn.close()
+        print("[Client handler] connection closed")
+        print()
 
     def run(self):
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
