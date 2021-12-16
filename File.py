@@ -49,8 +49,10 @@ class File:
     def set_information(self):
         self.dab_id = int(self.lines[0])
         self.message_type = int(self.lines[1])
-        self.category = Category(self.lines[2])
-        self.coordinates = (float(self.lines[3]), float(self.lines[4]))
+        self.category = Category(self.lines[2]) 
+
+        if len(self.lines) > 3:  
+            self.coordinates = (float(self.lines[3]), float(self.lines[4]))
 
     def set_status(self, status):
         if type(status) == type(self.status):
