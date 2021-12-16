@@ -1,6 +1,8 @@
 import json
 from abc import ABC, abstractmethod
 
+from Category import Category
+
 class Request(ABC):
     def __init__(self, folder):
         self.folder = folder
@@ -44,7 +46,7 @@ class LatestRequest(Request):
 class CategoryRequest(Request):
     def __init__(self, folder, category):
         super().__init__(folder)
-        self.category = category
+        self.category = Category(category)
 
     def parse(self):
         """A request to get the information from the files that belong to category"""
