@@ -48,7 +48,6 @@ class Ethernet:
         self.sock.send(pad_msg_length(max_msg_length, len(buffer)))
         self.sock.send(buffer.encode())
     
-
     def read_socket(self, max_msg_length):
         reply_length = self.sock.recv(max_msg_length).decode()
         reply = self.sock.recv(int(reply_length)).decode()
