@@ -133,8 +133,9 @@ class EthernetStrategy(Strategy):
                 self.interface.connect_socket() 
                 self.interface.write(data, max_msg_length)
                 reply = self.interface.read_socket(max_msg_length)
-
-                if not reply.get('reply'):
+                
+                # If 'reply' is in reply and false return False. If 'reply' is not in reply or not False return reply.
+                if reply.get('reply') == False:
                     return False
                 else:
                     return reply
