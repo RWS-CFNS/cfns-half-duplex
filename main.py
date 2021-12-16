@@ -15,6 +15,7 @@ from Interface.SPI import SPI
 from Interface.UART import UART
 from Folder import Folder
 from File import File
+from InterfaceOnboardSystems import InterfaceOnboardSystems
 from Status import Status
 from SenderID import SenderID
 
@@ -235,6 +236,10 @@ def execute():
     observer = Observer()
     observer.schedule(event_handler, path=event_handler.folder.path, recursive=True)
 
+    # Startup the interface for the onboard systems
+    interface = InterfaceOnboardSystems(dab_folder)
+    interface.start()
+    
     # Let the monitor no what the filename of devices is. So it can attach_devices later.
     event_handler.devices_csv_filename = args.devices
 
