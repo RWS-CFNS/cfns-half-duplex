@@ -55,7 +55,7 @@ class InterfaceOnboardSystems(threading.Thread):
         conn.send(response.encode())
 
     def choose_request(self, request_type, category = []):
-        if request_type == "newest":
+        if request_type == "latest":
             return LatestRequest(self.folder)
         elif request_type == "by_category":
             return CategoryRequest(self.folder, category)
