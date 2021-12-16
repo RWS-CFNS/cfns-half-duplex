@@ -19,11 +19,10 @@
 #    along with cfns-half-duplex. If not, see <https://www.gnu.org/licenses/>.
 #
 
-from Interface import Interface
 import serial # type: ignore this line 
 from serial import Serial # type: ignore this line
 
-class UART(Interface):
+class UART:
     def __init__(self):
         self.port = ""
         self.baudrate = 0

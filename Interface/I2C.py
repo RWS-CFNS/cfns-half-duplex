@@ -21,9 +21,7 @@
 
 from smbus2 import SMBus, i2c_msg
 
-from Interface import Interface # type: ignore this line
-
-class I2C(Interface):
+class I2C:
     def __init__(self):
         self.target_address = 0
         self.bus = SMBus()

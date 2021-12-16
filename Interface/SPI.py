@@ -19,11 +19,10 @@
 #    along with cfns-half-duplex. If not, see <https://www.gnu.org/licenses/>.
 #
 
-from Interface import Interface
 import spidev # type: ignore this line
 
 
-class SPI(Interface):
+class SPI:
     def __init__(self):
         self.spi = spidev.SpiDev()
         self.spi_bus = 0
@@ -60,7 +59,7 @@ class SPI(Interface):
         self.spi.writebytes([buff])
         print("data send")
 
-    def read_spi(self):
+    def read_spi(self, amount_of_bytes=64):
         # Read 64 bytes from address 80
-        msg = self.spi.readbytes(64)
+        msg = self.spi.readbytes(amount_of_bytes)
         return msg
