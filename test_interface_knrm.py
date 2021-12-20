@@ -1,8 +1,6 @@
 import unittest
 import socket
 import json
-from unittest import result
-from unittest.case import expectedFailure
 from InterfaceOnboardSystems import ClientClosedConnectionError, InterfaceOnboardSystems
 
 class OnBoardInterfaceTester(unittest.TestCase):
@@ -25,5 +23,3 @@ class OnBoardInterfaceTester(unittest.TestCase):
     def test_failed_receive_message(self):
         with self.assertRaises(ClientClosedConnectionError):
             _ = self.test_interface.receive_message(self.conn)
-        
-unittest.main()
