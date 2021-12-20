@@ -19,14 +19,16 @@
 #    along with cfns-half-duplex. If not, see <https://www.gnu.org/licenses/>.
 #
 
+import time
 import unittest
 from Devices.Strategy import AISStrategy, I2CStrategy
+from Interface import I2C, SPI, UART, Ethernet
+from Status import Status
 
 import main
 from File import File
 from Folder import Folder
 from Devices.Device import Device
-from Interface import Interface
 from main import Monitor, attach_devices
 
 ''''
@@ -83,34 +85,44 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(test_file, result_files[0])
 
     def test_device(self):
-        test_device = Device("AIS Transponder1", "True Heading", "AIS Base Station", 0)
+        test_device = Device("AIS Transponder1", "True Heading", "AIS Base Station", "AIS", 0)
         result_name = test_device.get_name()
         result_branch = test_device.get_branch()
         result_model = test_device.get_model()
+        result_technology = test_device.get_technology()
+        result_priority = test_device.get_priority()
         result_strategy = test_device.get_strategy()
 
         self.assertEqual("AIS Transponder1", result_name)
         self.assertEqual("True Heading", result_branch)
         self.assertEqual("AIS Base Station", result_model)
+        self.assertEqual("AIS", result_technology)
+        self.assertEqual(0, result_priority)
         self.assertEqual(AISStrategy, result_strategy)
 
         test_device.set_name("test_name")
         test_device.set_branch("python_unit")
         test_device.set_model("PU-00")
-        test_device.set_strategy_based_on_interface_type(1)
+        test_device.set_technology("python")
+        test_device.priority(2)
+        test_device.set_strategy(I2CStrategy())
 
         new_result_name = test_device.get_name()
         new_result_branch = test_device.get_branch()
         new_result_model = test_device.get_model()
+        new_result_technology = test_device.get_technology()
+        new_result_priority = test_device.get_priority()
         new_result_strategy = test_device.get_strategy()
 
         self.assertEqual("test_name", new_result_name)
         self.assertEqual("python_unit", new_result_branch)
         self.assertEqual("PU-00", new_result_model)
+        self.assertEqual("PU-00", new_result_technology)
+        self.assertEqual(3, new_result_priority)  
         self.assertEqual(I2CStrategy, new_result_strategy)
 
     def test_rs232(self):
-        test_rs232 = Interface.UART()
+        test_rs232 = UART()
         #test_rs232.init_serial("/dev/ttyUSB0", 115200)
         test_rs232.set_port("/dev/ttyUSB0")
         test_rs232.set_baudrate(38400)
@@ -123,13 +135,13 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(False, test_rs232.close_rs232())
 
     def test_i2c(self):
-        test_i2c = Interface.I2C()
+        test_i2c = I2C()
         #test_i2c.init_i2c(4)
         test_i2c.set_address(4)
         self.assertEqual(4, test_i2c.get_address())
 
     def test_ethernet(self):
-        test_ethernet = Interface.Ethernet()
+        test_ethernet = Ethernet()
         test_ethernet.init_socket("192.168.0.101", 1234)
 
         self.assertEqual("192.168.0.101", test_ethernet.get_ip_address())
@@ -138,7 +150,7 @@ class MyTestCase(unittest.TestCase):
 
 
     def test_spi(self):
-        test_spi = Interface.SPI()
+        test_spi = SPI()
         #test_spi.init_spi(0, 1)
         test_spi.set_spi_bus(0)
         test_spi.set_spi_device(1)
@@ -147,9 +159,46 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(1, test_spi.get_spi_device())
 
     def test_acknowledge(self):
-        test_monitor = Monitor("./correct")
-        main.attach_devices("devices.csv")
-        #test_monitor.acknowledge(67, 1)
+        # Prepare the monitor
+        test_folder = Folder("./correct")
+        test_monitor = Monitor(test_folder)
+        
+        # Fills the list of devices with one device so choose device is not necessary
+        test_monitor.devices = attach_devices("devices.csv") 
+        test_device_list = test_monitor.devices
+
+        # Fill the folder with test files 
+        test_file1 = File("test1")
+        test_file1.dab_id = 67
+        test_file1.message_type = 4
+        test_file2 = File("test2")
+        test_file2.dab_id = 100
+        test_file2.message_type = 2
+        test_file3 = File("test3")
+        test_file3.dab_id = 6
+        test_file3.message_type = 1
+        test_monitor.folder.files = [test_file1, test_file2, test_file3]
+
+        # Create the data to send
+        time_of_arrival = time.time()
+        data1 = test_monitor.create_confirmation_dict(test_file1.get_dab_id(), test_file1.get_message_type(), time_of_arrival)
+        data2 = test_monitor.create_confirmation_dict(test_file2.get_dab_id(), test_file2.get_message_type(), time_of_arrival)
+        data3 = test_monitor.create_confirmation_dict(test_file3.get_dab_id(), test_file3.get_message_type(), time_of_arrival)
+
+        # Here the tests will be executed and determined if they were a succes or not
+        expected_result = Status.CONFIRMED
+
+        test_monitor.acknowledge(data1, test_device_list)
+        file1_after_test = test_monitor.folder.find_file_by_dab_id(test_file1.get_dab_id())
+        self.assertEqual(file1_after_test.get_status(), expected_result)
+
+        test_monitor.acknowledge(data2, test_device_list)
+        file2_after_test = test_monitor.folder.find_file_by_dab_id(test_file2.get_dab_id())
+        self.assertEqual(file2_after_test.get_status(), expected_result)
+
+        test_monitor.acknowledge(data3, test_device_list)
+        file3_after_test = test_monitor.folder.find_file_by_dab_id(test_file3.get_dab_id())
+        self.assertEqual(file3_after_test.get_status(), expected_result)
 
 
 

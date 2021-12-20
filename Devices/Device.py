@@ -86,6 +86,11 @@ class Device:
     def set_technology(self, new_technology):
         self.technology = new_technology
 
+    def get_priority(self):
+        return self.priority
+
+    def set_priority(self, new_priority):
+        self.priority = new_priority
 
 '''
 AIS device with interface
