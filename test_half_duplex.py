@@ -146,9 +146,8 @@ class MyTestCase(unittest.TestCase):
 
     def test_i2c(self):
         test_interface = I2C()
-        #test_i2c.init_i2c(4)
-        test_interface.set_address(4)
-        self.assertEqual(4, test_interface.get_address())
+        test_interface.init_i2c(4)
+        self.assertEqual(4, test_interface.get_target_address())
 
     def test_ethernet(self):
         test_interface = Ethernet()
@@ -161,9 +160,7 @@ class MyTestCase(unittest.TestCase):
 
     def test_spi(self):
         test_interface = SPI()
-        #test_spi.init_spi(0, 1)
-        test_interface.set_spi_bus(0)
-        test_interface.set_spi_device(1)
+        test_interface.init_spi(0, 1)
 
         self.assertEqual(0, test_interface.get_spi_bus())
         self.assertEqual(1, test_interface.get_spi_device())
