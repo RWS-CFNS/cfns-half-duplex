@@ -55,6 +55,7 @@ class MyTestCase(unittest.TestCase):
         test_path = "correct/"
         test_file = File(test_filename)
         test_file.set_lines(test_path)
+        test_file.set_information()
 
         # assign data from dab+ message to variables
         test_dab_id = test_file.get_dab_id()
