@@ -52,7 +52,6 @@ class MyTestCase(unittest.TestCase):
         assess_latitude = 52.6525
         assess_longitude = 4.7448
         
-
         # read the data from dab+ message
         test_filename = "bb.txt"
         test_path = "correct/"
