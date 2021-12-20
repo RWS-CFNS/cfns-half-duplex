@@ -38,7 +38,7 @@ class Device:
             if not reply:
                 return False
 
-            if reply.get("reply") is True:
+            if reply.get("reply") == True:
                 return True
             else:
                 # reply is False if has_reach failes due to the reach of the technology or an error occuring

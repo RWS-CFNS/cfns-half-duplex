@@ -85,7 +85,6 @@ class Monitor(PatternMatchingEventHandler):
         # Build the confirmation dict which contains all the necessary information to acknowledge a DAB messsage
         data = self.create_confirmation_dict(dab_id, message_type, time_of_arrival)
         
-        
         devices = self.choose_device()
 
         # If there is no device available. Abort the acknowledgment
@@ -192,6 +191,7 @@ class Monitor(PatternMatchingEventHandler):
         print("\nStatus of files (dab_id, file status")
         for file in self.folder.files:
             print(file.get_dab_id(), file.get_status())
+        print()
 
     def retry_failed_confirmation(self):
         for file in self.folder.files:

@@ -114,7 +114,7 @@ class InterfaceOnboardSystems(threading.Thread):
 
         while True:
             conn, _ = server.accept()
-            print("[Server] conn accepted from {conn}")
+            print(f"[Server] conn accepted from {conn}")
 
             print("[Server] starting client handler")
             client_thread = threading.Thread(target=self.handle_client, args=[conn])

@@ -57,7 +57,7 @@ class CategoryRequest(Request):
     
     def build_response(self, information):
         """A method to build a response for a CategoryRequest"""
-        return json.dumps({"reply": True, "category": self.category, "information": information})
+        return json.dumps({"reply": True, "category": self.category.value, "information": information})
 
 class TestRequest(Request):
     def __init__(self, folder):
