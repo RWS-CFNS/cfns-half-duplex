@@ -46,8 +46,8 @@ class MyTestCase(unittest.TestCase):
     def test_file(self):
 
         # expected values when reading from dab+ message "bb.txt"
-        assess_dab_id = 67
-        assess_message_type = 4
+        assess_dab_id = 68
+        assess_message_type = 2
         asesss_category = Category.OTHER
         assess_latitude = 52.6525
         assess_longitude = 4.7448
@@ -91,6 +91,8 @@ class MyTestCase(unittest.TestCase):
 
     def test_device(self):
         test_device = Device("AIS Transponder1", "True Heading", "AIS Base Station", "AIS", 0)
+        test_device.set_strategy(AISStrategy())
+
         result_name = test_device.get_name()
         result_branch = test_device.get_branch()
         result_model = test_device.get_model()
@@ -127,41 +129,41 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(I2CStrategy, new_result_strategy)
 
     def test_rs232(self):
-        test_rs232 = UART()
+        test_interface = UART()
         #test_rs232.init_serial("/dev/ttyUSB0", 115200)
-        test_rs232.set_port("/dev/ttyUSB0")
-        test_rs232.set_baudrate(38400)
-        result_port = test_rs232.get_port()
-        result_baudrate = test_rs232.get_baudrate()
+        test_interface.set_port("/dev/ttyUSB0")
+        test_interface.set_baudrate(38400)
+        result_port = test_interface.get_port()
+        result_baudrate = test_interface.get_baudrate()
 
         self.assertEqual("/dev/ttyUSB0", result_port)
         self.assertEqual(38400, result_baudrate)
 
-        self.assertEqual(False, test_rs232.close_rs232())
+        self.assertEqual(False, test_interface.close_rs232())
 
     def test_i2c(self):
-        test_i2c = I2C()
+        test_interface = I2C()
         #test_i2c.init_i2c(4)
-        test_i2c.set_address(4)
-        self.assertEqual(4, test_i2c.get_address())
+        test_interface.set_address(4)
+        self.assertEqual(4, test_interface.get_address())
 
     def test_ethernet(self):
-        test_ethernet = Ethernet()
-        test_ethernet.init_socket("192.168.0.101", 1234)
+        test_interface = Ethernet()
+        test_interface.init_socket("192.168.0.101", 1234)
 
-        self.assertEqual("192.168.0.101", test_ethernet.get_ip_address())
-        self.assertEqual(1234, test_ethernet.get_port())
-        test_ethernet.close_socket()
+        self.assertEqual("192.168.0.101", test_interface.get_ip_address())
+        self.assertEqual(1234, test_interface.get_port())
+        test_interface.close_socket()
 
 
     def test_spi(self):
-        test_spi = SPI()
+        test_interface = SPI()
         #test_spi.init_spi(0, 1)
-        test_spi.set_spi_bus(0)
-        test_spi.set_spi_device(1)
+        test_interface.set_spi_bus(0)
+        test_interface.set_spi_device(1)
 
-        self.assertEqual(0, test_spi.get_spi_bus())
-        self.assertEqual(1, test_spi.get_spi_device())
+        self.assertEqual(0, test_interface.get_spi_bus())
+        self.assertEqual(1, test_interface.get_spi_device())
 
     def test_acknowledge(self):
         # Prepare the monitor
