@@ -6,7 +6,7 @@ from InterfaceOnboardSystems import ClientClosedConnectionError, InterfaceOnboar
 class OnBoardInterfaceTester(unittest.TestCase):
     def setUp(self):
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.server.bind(("192.168.178.21", 8001))
+        self.server.bind(("192.168.178.68", 8001))
         self.server.listen()
         self.conn, _ = self.server.accept()
         self.test_interface = InterfaceOnboardSystems("")
