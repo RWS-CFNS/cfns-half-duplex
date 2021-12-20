@@ -114,7 +114,7 @@ class MyTestCase(unittest.TestCase):
         test_device_instance.set_branch("python_unit")
         test_device_instance.set_model("PU-00")
         test_device_instance.set_technology("python")
-        test_device_instance.priority(2)
+        test_device_instance.set_priority(2)
         test_device_instance.set_strategy(I2CStrategy(I2C()))
 
         new_result_name = test_device_instance.get_name()
@@ -129,7 +129,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual("PU-00", new_result_model)
         self.assertEqual("PU-00", new_result_technology)
         self.assertEqual(3, new_result_priority)  
-        self.assertTrue(isinstance(result_strategy, I2CStrategy))
+        self.assertTrue(isinstance(new_result_strategy, I2CStrategy))
 
     def test_rs232(self):
         test_interface = UART()
