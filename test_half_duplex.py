@@ -21,6 +21,7 @@
 
 import time
 import unittest
+from Category import Category
 from Devices.Strategy import AISStrategy, I2CStrategy
 from Interface import I2C, SPI, UART, Ethernet
 from Status import Status
@@ -47,8 +48,10 @@ class MyTestCase(unittest.TestCase):
         # expected values when reading from dab+ message "bb.txt"
         assess_dab_id = 67
         assess_message_type = 4
+        asesss_category = Category.OTHER
         assess_latitude = 52.6525
         assess_longitude = 4.7448
+        
 
         # read the data from dab+ message
         test_filename = "bb.txt"
@@ -60,11 +63,13 @@ class MyTestCase(unittest.TestCase):
         # assign data from dab+ message to variables
         test_dab_id = test_file.get_dab_id()
         test_message_type = test_file.get_message_type()
+        test_category = test_file.get_category()
         test_latitude, test_longitude = test_file.get_coordinates()
 
         # check if the data from dab+ message equals to the expected data
         self.assertEqual(assess_dab_id, test_dab_id)
         self.assertEqual(assess_message_type, test_message_type)
+        self.assertEqual(asesss_category, test_category)
         self.assertEqual(assess_latitude, test_latitude)
         self.assertEqual(assess_longitude, test_longitude)
 
