@@ -2,11 +2,11 @@ from test_wifi import WifiConfirmTester
 from test_half_duplex import MyTestCase
 from test_choosing_devices import ChoosingDevicesTester
 from test_retrying_ack import RetryingAckTester
-
+from test_interface_knrm import OnBoardInterfaceTester
 import unittest
 
 def main():
-    test_classes = [WifiConfirmTester(), ChoosingDevicesTester(), MyTestCase(), RetryingAckTester()]
+    test_classes = [WifiConfirmTester(), ChoosingDevicesTester(), MyTestCase(), RetryingAckTester(), OnBoardInterfaceTester()]
     function_names_of_test_classes = {test_class:get_function_names_startwith_test(test_class) for test_class in test_classes}
 
     test_name = input("Welke test wilt u uitvoeren? ")
