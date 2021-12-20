@@ -23,7 +23,10 @@ import time
 import unittest
 from Category import Category
 from Devices.Strategy import AISStrategy, I2CStrategy
-from Interface import I2C, SPI, UART, Ethernet
+from Interface.Ethernet import Ethernet
+from Interface.I2C import I2C
+from Interface.SPI import SPI
+from Interface.UART import UART
 from Status import Status
 
 import main
