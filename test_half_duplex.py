@@ -90,15 +90,15 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(test_file, result_files[0])
 
     def test_device(self):
-        test_device = Device("AIS Transponder1", "True Heading", "AIS Base Station", "AIS", 0)
-        test_device.set_strategy(AISStrategy(UART()))
+        test_device_instance = Device("AIS Transponder1", "True Heading", "AIS Base Station", "AIS", 0)
+        test_device_instance.set_strategy(AISStrategy(UART()))
 
-        result_name = test_device.get_name()
-        result_branch = test_device.get_branch()
-        result_model = test_device.get_model()
-        result_technology = test_device.get_technology()
-        result_priority = test_device.get_priority()
-        result_strategy = test_device.get_strategy()
+        result_name = test_device_instance.get_name()
+        result_branch = test_device_instance.get_branch()
+        result_model = test_device_instance.get_model()
+        result_technology = test_device_instance.get_technology()
+        result_priority = test_device_instance.get_priority()
+        result_strategy = test_device_instance.get_strategy()
 
         self.assertEqual("AIS Transponder1", result_name)
         self.assertEqual("True Heading", result_branch)
@@ -107,19 +107,19 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(0, result_priority)
         self.assertEqual(AISStrategy, result_strategy)
 
-        test_device.set_name("test_name")
-        test_device.set_branch("python_unit")
-        test_device.set_model("PU-00")
-        test_device.set_technology("python")
-        test_device.priority(2)
-        test_device.set_strategy(I2CStrategy(I2C()))
+        test_device_instance.set_name("test_name")
+        test_device_instance.set_branch("python_unit")
+        test_device_instance.set_model("PU-00")
+        test_device_instance.set_technology("python")
+        test_device_instance.priority(2)
+        test_device_instance.set_strategy(I2CStrategy(I2C()))
 
-        new_result_name = test_device.get_name()
-        new_result_branch = test_device.get_branch()
-        new_result_model = test_device.get_model()
-        new_result_technology = test_device.get_technology()
-        new_result_priority = test_device.get_priority()
-        new_result_strategy = test_device.get_strategy()
+        new_result_name = test_device_instance.get_name()
+        new_result_branch = test_device_instance.get_branch()
+        new_result_model = test_device_instance.get_model()
+        new_result_technology = test_device_instance.get_technology()
+        new_result_priority = test_device_instance.get_priority()
+        new_result_strategy = test_device_instance.get_strategy()
 
         self.assertEqual("test_name", new_result_name)
         self.assertEqual("python_unit", new_result_branch)
@@ -172,7 +172,7 @@ class MyTestCase(unittest.TestCase):
         
         # Fills the list of devices with one device so choose device is not necessary
         test_monitor.devices = attach_devices("devices.csv") 
-        test_device_list = test_monitor.devices
+        test_device_instance_list = test_monitor.devices
 
         # Fill the folder with test files 
         test_file1 = File("test1")
@@ -195,15 +195,15 @@ class MyTestCase(unittest.TestCase):
         # Here the tests will be executed and determined if they were a succes or not
         expected_result = Status.CONFIRMED
 
-        test_monitor.acknowledge(data1, test_device_list)
+        test_monitor.acknowledge(data1, test_device_instance_list)
         file1_after_test = test_monitor.folder.find_file_by_dab_id(test_file1.get_dab_id())
         self.assertEqual(file1_after_test.get_status(), expected_result)
 
-        test_monitor.acknowledge(data2, test_device_list)
+        test_monitor.acknowledge(data2, test_device_instance_list)
         file2_after_test = test_monitor.folder.find_file_by_dab_id(test_file2.get_dab_id())
         self.assertEqual(file2_after_test.get_status(), expected_result)
 
-        test_monitor.acknowledge(data3, test_device_list)
+        test_monitor.acknowledge(data3, test_device_instance_list)
         file3_after_test = test_monitor.folder.find_file_by_dab_id(test_file3.get_dab_id())
         self.assertEqual(file3_after_test.get_status(), expected_result)
 
