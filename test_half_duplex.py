@@ -127,7 +127,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual("test_name", new_result_name)
         self.assertEqual("python_unit", new_result_branch)
         self.assertEqual("PU-00", new_result_model)
-        self.assertEqual("PU-00", new_result_technology)
+        self.assertEqual("python", new_result_technology)
         self.assertEqual(3, new_result_priority)  
         self.assertTrue(isinstance(new_result_strategy, I2CStrategy))
 
