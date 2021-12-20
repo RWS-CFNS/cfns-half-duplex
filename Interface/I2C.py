@@ -29,6 +29,9 @@ class I2C:
     def get_target_address(self): 
         return self.target_address
 
+    def set_target_address(self, target_addres):
+        self.target_address = target_addres
+        
     def init_i2c(self, target_address):
         self.target_address = target_address
         self.bus = SMBus(1)
