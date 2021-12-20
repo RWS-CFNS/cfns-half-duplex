@@ -43,7 +43,6 @@ class SPI:
     def init_spi(self, spi_bus, spi_device):
         self.spi_bus = spi_bus
         self.spi_device = spi_device
-        self.spi.max_speed_hz = 1000000
 
     def open_spi(self):
         self.spi.open(self.spi_bus, self.spi_device)
