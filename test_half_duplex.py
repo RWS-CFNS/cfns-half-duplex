@@ -108,7 +108,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual("AIS Base Station", result_model)
         self.assertEqual("AIS", result_technology)
         self.assertEqual(0, result_priority)
-        self.assertEqual(AISStrategy, result_strategy)
+        self.assertTrue(isinstance(result_strategy, AISStrategy))
 
         test_device_instance.set_name("test_name")
         test_device_instance.set_branch("python_unit")
@@ -129,7 +129,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual("PU-00", new_result_model)
         self.assertEqual("PU-00", new_result_technology)
         self.assertEqual(3, new_result_priority)  
-        self.assertEqual(I2CStrategy, new_result_strategy)
+        self.assertTrue(isinstance(result_strategy, I2CStrategy))
 
     def test_rs232(self):
         test_interface = UART()
