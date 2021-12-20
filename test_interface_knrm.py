@@ -20,5 +20,8 @@ class OnBoardInterfaceTester(unittest.TestCase):
         result = self.test_interface.receive_message(self.conn)
         self.assertEqual(result, expected_result)
 
+    def test_failed_receive(self):
         with self.assertRaises(ClientClosedConnectionError):
             _ = self.test_interface.receive_message(self.conn)
+
+    
