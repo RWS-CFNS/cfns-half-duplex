@@ -91,7 +91,7 @@ class MyTestCase(unittest.TestCase):
 
     def test_device(self):
         test_device = Device("AIS Transponder1", "True Heading", "AIS Base Station", "AIS", 0)
-        test_device.set_strategy(AISStrategy())
+        test_device.set_strategy(AISStrategy(UART()))
 
         result_name = test_device.get_name()
         result_branch = test_device.get_branch()
@@ -112,7 +112,7 @@ class MyTestCase(unittest.TestCase):
         test_device.set_model("PU-00")
         test_device.set_technology("python")
         test_device.priority(2)
-        test_device.set_strategy(I2CStrategy())
+        test_device.set_strategy(I2CStrategy(I2C()))
 
         new_result_name = test_device.get_name()
         new_result_branch = test_device.get_branch()
