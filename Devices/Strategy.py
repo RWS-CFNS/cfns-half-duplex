@@ -128,17 +128,18 @@ class EthernetStrategy(Strategy):
             # This is the max size a message containing the length of the message can be.
             max_msg_length = 10 
 
+            reply = {"reply": False}
             self.interface.init_socket(self.interface.ip_address, self.interface.socket_port)
             with self.interface.sock:
                 self.interface.connect_socket() 
                 self.interface.write(data, max_msg_length)
                 reply = self.interface.read_socket(max_msg_length)
                 
-                # If 'reply' is in reply and false return False. If 'reply' is not in reply or not False return reply.
-                if reply.get('reply') == False:
-                    return False
-                else:
-                    return reply
+            # If 'reply' is in reply and false return False. If 'reply' is not in reply or not False return reply.
+            if reply.get('reply') == False:
+                return False
+            else:
+                return reply
         except Exception as e:
             print(e)
             return False

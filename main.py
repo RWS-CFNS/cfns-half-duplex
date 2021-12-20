@@ -153,6 +153,11 @@ class Monitor(PatternMatchingEventHandler):
         This method is responsible for acknowledging the DAB file with all the best device available. Can be one or multiple devices.
     """
     def acknowledge(self, data, devices):
+        if not devices:
+            # Update the file to SKIP, because the acknowledgment failed for an unkown reason
+            self.folder.update_file(data.get("dab_id"), status=Status.SKIP)
+            return
+
         for device in devices:
             # Change data when using the Sodaq One. Otherwise add the technology used by the device.
             if isinstance(device.strategy, I2CStrategy):
