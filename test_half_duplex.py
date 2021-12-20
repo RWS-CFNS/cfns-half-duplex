@@ -114,7 +114,7 @@ class MyTestCase(unittest.TestCase):
         test_device_instance.set_branch("python_unit")
         test_device_instance.set_model("PU-00")
         test_device_instance.set_technology("python")
-        test_device_instance.set_priority(2)
+        test_device_instance.set_priority(3)
         test_device_instance.set_strategy(I2CStrategy(I2C()))
 
         new_result_name = test_device_instance.get_name()
