@@ -1,9 +1,12 @@
 import unittest
 import socket
 import json
-from unittest import result
+from unittest.case import expectedFailure
+from Category import Category
 from Error import Error
 from InterfaceOnboardSystems import ClientClosedConnectionError, InterfaceOnboardSystems
+from Request import CategoryRequest, LatestRequest, TestRequest
+from Folder import Folder
 
 class OnBoardInterfaceTester(unittest.TestCase):
     """
@@ -67,11 +70,71 @@ class OnBoardInterfaceTester(unittest.TestCase):
         self.assertEqual(result, expected_result)
 
         # Tests if the interface can validate the input false and return an Error when the message does not contain the required keys in the send dict.
-        incorrect_field_message = json.dumps({"afakj": 0})
+        incorrect_field_message = json.dumps({"random": 0})
         expected_result = Error.INCORRECT_FIELD
         result = self.test_interface.extract_request(incorrect_field_message)
         self.assertEqual(result, expected_result)
 
     def test_interface_interpret_message(self):
-        self.test_interface.choose_request()
+        # This test checks when you pass in a dict as choose_request expects with a valid request_type it will return the request object asked for.
+        correct_input = {"request_type": "test"}
+        expected_result = TestRequest
+        result = self.test_interface.choose_request(**correct_input)
+        self.assertTrue(isinstance(result, expected_result))
+        
+        # This checks if the method will return an Error when the request_type is not known.
+        incorrect_input = {"request_type": False}
+        expected_result = Error.UNKOWN_REQUEST_TYPE
+        result = self.test_interface.choose_request(**incorrect_input)
+        self.assertEqual(result, expected_result)
 
+        # This test does the same thing as the test above but also tests if it will ignore unknown keywords.
+        incorrect_input = {"request_type": False, "unused random keyword": 0}
+        expected_result = Error.UNKOWN_REQUEST_TYPE
+        result = self.test_interface.choose_request(**incorrect_input)
+        self.assertEqual(result, expected_result)
+
+    def test_build_response(self):
+        test_information = [1,2,3,4]
+        test_folder = Folder("")
+
+        # Tests if build_response returns the expected json string
+        expected_result = json.dumps({"reply": True, "information": test_information})
+        result = LatestRequest(test_folder).build_response(test_information)
+        self.assertEqual(result, expected_result)
+
+        # expected_result is the same as above, so not redefined.
+        result = TestRequest(test_folder).build_response(test_information)
+        self.assertEqual(result, expected_result)
+
+        # Tests if the buid_response returns a json string in the format defined in expected_result.
+        category = Category.OTHER
+        expected_result = json.dumps({"reply": True, "category": category.value, "information": test_information})
+        result = CategoryRequest(test_folder, category).build_response(test_information)
+        self.assertEqual(result, expected_result)
+
+    def test_reply(self):
+        conn, _ = self.server.accept()
+
+        test_response = "test_response"
+        self.test_interface.send_response(conn, test_response)
+
+        # To get an accurate test result test receive message before this test.
+        result = self.test_interface.receive_message(conn)
+        self.assertEqual(result, test_response)
+
+        # It does not matter which Error value is used here. NO_DICT is just an example.
+        test_error_response = Error.NO_DICT
+        self.test_interface.send_error(conn, test_error_response)
+
+        # To get an accurate test result test receive message before this test.
+        expected_result = json.dumps({"reply": False, "error_message": test_error_response.value})
+        result = self.test_interface.receive_message(conn)
+        self.assertEqual(result, expected_result)
+
+        conn.close()
+
+    def test_onboard_interface(self):
+        ...
+
+        

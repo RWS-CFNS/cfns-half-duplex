@@ -48,10 +48,7 @@ class InterfaceOnboardSystems(threading.Thread):
             return request
     
     def send_error(self, conn, error):
-        error_message = json.dumps({
-            "reply": False,
-            "error_message": error.value
-        })
+        error_message = json.dumps({"reply": False, "error_message": error.value})
 
         self.send_response(conn, error_message)
     
