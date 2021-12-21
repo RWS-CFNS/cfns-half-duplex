@@ -35,10 +35,17 @@ class InterfaceOnboardSystems(threading.Thread):
             return Error.INCORRECT_JSON_DECODER
         
         # Check if the request is a dict, because the interface works with the request as a dict.
-        if isinstance(request, dict): 
-            return request
-        else:
+        if not isinstance(request, dict): 
             return Error.NO_DICT
+
+        # Is a list so you can easily expand the required keys that request must contain.
+        required_keys = ["request_type"]
+
+        for required_key in required_keys:
+            if not required_key in request.keys():
+                return Error.INCORRECT_FIELD
+        else:
+            return request
     
     def send_error(self, conn, error):
         error_message = json.dumps({
@@ -54,7 +61,7 @@ class InterfaceOnboardSystems(threading.Thread):
         conn.send(response_length)
         conn.send(response.encode())
 
-    def choose_request(self, request_type, category = []):
+    def choose_request(self, request_type, category = [], **kwargs):
         if request_type == "latest":
             return LatestRequest(self.folder)
         elif request_type == "by_category":

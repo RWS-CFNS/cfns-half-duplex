@@ -66,5 +66,12 @@ class OnBoardInterfaceTester(unittest.TestCase):
         result = self.test_interface.extract_request(no_dict_message)
         self.assertEqual(result, expected_result)
 
-    
+        # Tests if the interface can validate the input false and return an Error when the message does not contain the required keys in the send dict.
+        incorrect_field_message = json.dumps({"afakj": 0})
+        expected_result = Error.INCORRECT_FIELD
+        result = self.test_interface.extract_request(incorrect_field_message)
+        self.assertEqual(result, expected_result)
+
+    def test_interface_interpret_message(self):
+        self.test_interface.choose_request()
 
