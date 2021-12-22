@@ -99,11 +99,13 @@ class OnBoardInterfaceTester(unittest.TestCase):
     def test_parse(self):
         test_file = File("")
         test_file.lines = [90,1,"other"]
-        self.test_interface.folder.files = [test_file]
+        test_file2 = File("")
+        test_file2.lines = [10, 2, "weather"] 
+        self.test_interface.folder.files = [test_file, test_file2]
 
-        expected_result = [(test_file.lines[0], test_file.lines[1:])]
+        expected_result = [test_file.lines, test_file2.lines]
         result = LatestRequest(self.test_interface.folder).parse()
-        self.assertEqual(result, expected_result)
+        self.assertEqual(result, test_file.lines)
 
         # expected restult is the same as above
         result = CategoryRequest(self.test_interface.folder).parse()
