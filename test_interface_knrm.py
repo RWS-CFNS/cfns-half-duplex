@@ -173,6 +173,9 @@ class OnBoardInterfaceTester(unittest.TestCase):
         conn.close()
 
     def test_onboard_interface(self):
+        # Print to display print lines better
+        print()
+
         file_information = [
             [1,1,"location", 1.234, 5.678],
             [2,1,"weather"],
