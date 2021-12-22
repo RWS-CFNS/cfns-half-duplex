@@ -174,7 +174,7 @@ class OnBoardInterfaceTester(unittest.TestCase):
 
     def test_onboard_interface(self):
         file_information = [
-            [1,1,"location",[1.234, 5.678]],
+            [1,1,"location", 1.234, 5.678],
             [2,1,"weather"],
             [3,1,"weather"],
             [4,1,"other"],
