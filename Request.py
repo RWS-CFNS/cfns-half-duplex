@@ -4,9 +4,9 @@ from abc import ABC, abstractmethod
 from Category import Category
 
 class Request(ABC):
-    def __init__(self, folder, validFiles):
+    def __init__(self, folder, valid):
         self.folder = folder
-        self.valid = validFiles
+        self.valid = valid
 
     @abstractmethod
     def parse(self):
@@ -39,25 +39,25 @@ class Request(ABC):
         return json.dumps({"reply": True, "information": information})
 
 class LatestRequest(Request):
-    def __init__(self, folder, validFiles):
-        super().__init__(folder, validFiles)
+    def __init__(self, folder, valid):
+        super().__init__(folder, valid)
 
     def parse(self):
         """A request to get the latest unsent valid information."""     
 
-        files = self.get_files('sent_to_onboard_systems', False)
+        files = self.get_files('sent_to_onboard_systems', False, self.valid)
 
         return self.build_information_list(files)
 
 class CategoryRequest(Request):
-    def __init__(self, folder, validFiles, category):
-        super().__init__(folder, validFiles)
+    def __init__(self, folder, valid, category):
+        super().__init__(folder, valid)
         self.category = Category(category)
 
     def parse(self):
         """A request to get the information from the files that belong to category"""
 
-        files = self.get_files('category', self.category)
+        files = self.get_files('category', self.category, self.valid)
         
         return self.build_information_list(files)
     
@@ -68,7 +68,7 @@ class CategoryRequest(Request):
 class TestRequest(Request):
     def __init__(self, folder):
         # Set validFiles none because it is required by request but not used in this request
-        super().__init__(folder, validFiles=None)
+        super().__init__(folder, valid=None)
 
     def build_information_list(self):
         return [[1, 4, "other", [1.1234, 5.6789]]]
