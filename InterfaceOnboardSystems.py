@@ -44,10 +44,13 @@ class InterfaceOnboardSystems(threading.Thread):
         """
             This checks if the request contains request_type. If not return an Error.
             When request_type is by_category it checks if the request also contains the key category. When that key is not available it will return an Error. 
+            When valid is in the request and the type is not a bool return an Error otherwise return the request 
             If there is a request_type present and it is not by_category return the request.
         """
         if required_key in request_keys:
             if request[required_key] == "by_category" and not "category" in request_keys:
+                return Error.INCORRECT_FORMAT
+            elif "valid" in request_keys and not type(request["valid"]) == bool:
                 return Error.INCORRECT_FORMAT
             else: 
                 return request
@@ -66,11 +69,11 @@ class InterfaceOnboardSystems(threading.Thread):
         conn.send(response_length)
         conn.send(response.encode())
 
-    def choose_request(self, request_type, category = [], **kwargs):
+    def choose_request(self, request_type, category = [], valid = True, **kwargs):
         if request_type == "latest":
-            return LatestRequest(self.folder)
+            return LatestRequest(self.folder, valid)
         elif request_type == "by_category":
-            return CategoryRequest(self.folder, category)
+            return CategoryRequest(self.folder, category, valid)
         elif request_type == "test":
             return TestRequest(self.folder)
         else:

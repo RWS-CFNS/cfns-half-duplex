@@ -4,8 +4,9 @@ from abc import ABC, abstractmethod
 from Category import Category
 
 class Request(ABC):
-    def __init__(self, folder):
+    def __init__(self, folder, validFiles):
         self.folder = folder
+        self.valid = validFiles
 
     @abstractmethod
     def parse(self):
@@ -14,11 +15,11 @@ class Request(ABC):
     """
         Get all the files for wich the field has the value value and is valid
     """
-    def get_files(self, field, value, valid=True):
+    def get_files(self, field, value, valid):
         files = self.folder.find_files_by_field(field, value)
         
-        # Filter all the File objects out of the list that are not valid.
-        files = [file for file in files if file.get_valid() == valid]
+        # Filter all the File objects out of the list that are not valid and have already been sent.
+        files = [file for file in files if file.get_valid() == valid and not file.get_sent_to_onboard_systems()]
 
         # Update the field sent_to_onboard_systems for every file in files.
         [file.set_sent_to_onboard_systems(True) for file in files]
@@ -38,8 +39,8 @@ class Request(ABC):
         return json.dumps({"reply": True, "information": information})
 
 class LatestRequest(Request):
-    def __init__(self, folder):
-        super().__init__(folder)
+    def __init__(self, folder, validFiles):
+        super().__init__(folder, validFiles)
 
     def parse(self):
         """A request to get the latest unsent valid information."""     
@@ -49,8 +50,8 @@ class LatestRequest(Request):
         return self.build_information_list(files)
 
 class CategoryRequest(Request):
-    def __init__(self, folder, category):
-        super().__init__(folder)
+    def __init__(self, folder, validFiles, category):
+        super().__init__(folder, validFiles)
         self.category = Category(category)
 
     def parse(self):
@@ -66,7 +67,8 @@ class CategoryRequest(Request):
 
 class TestRequest(Request):
     def __init__(self, folder):
-        super().__init__(folder)
+        # Set validFiles none because it is required by request but not used in this request
+        super().__init__(folder, validFiles=None)
 
     def build_information_list(self):
         return [[1, 4, "other", [1.1234, 5.6789]]]

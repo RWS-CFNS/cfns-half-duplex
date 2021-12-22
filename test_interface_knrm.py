@@ -59,6 +59,12 @@ class OnBoardInterfaceTester(unittest.TestCase):
         result = self.test_interface.extract_request(correct_message)
         self.assertEqual(result, expected_result)
 
+        # Tests if the extract_request method support the keyword valid in the send message when send as a dict in json format.
+        correct_message_with_valid = json.dumps({"request_type": "test", "valid": True})
+        expected_result = json.loads(correct_message_with_valid)
+        result = self.test_interface.extract_request(correct_message_with_valid)
+        self.assertEqual(result, expected_result)
+
         # Tests if the interface can validate the input false and return an Error when the message is not send in json format.
         no_json_message = "wrong no json"
         expected_result = Error.INCORRECT_JSON_DECODER
@@ -73,8 +79,14 @@ class OnBoardInterfaceTester(unittest.TestCase):
 
         # Tests if the interface can validate the input false and return an Error when the message does not contain the required keys in the send dict.
         incorrect_field_message = json.dumps({"random": 0})
-        expected_result = Error.INCORRECT_FIELD
+        expected_result = Error.INCORRECT_FORMAT
         result = self.test_interface.extract_request(incorrect_field_message)
+        self.assertEqual(result, expected_result)
+
+        # Tests if the interface can validate the input false and return an Error when the message contains illegal values for keys.
+        incorrect_field_message_with_valid = json.dumps({"request_type": "test", "valid": 2})
+        expected_result = Error.INCORRECT_FORMAT
+        result = self.test_interface.extract_request(incorrect_field_message_with_valid)
         self.assertEqual(result, expected_result)
 
     def test_interface_interpret_message(self):
@@ -83,7 +95,7 @@ class OnBoardInterfaceTester(unittest.TestCase):
         expected_result = TestRequest
         result = self.test_interface.choose_request(**correct_input)
         self.assertTrue(isinstance(result, expected_result))
-        
+
         # This checks if the method will return an Error when the request_type is not known.
         incorrect_input = {"request_type": False}
         expected_result = Error.UNKOWN_REQUEST_TYPE
@@ -161,12 +173,17 @@ class OnBoardInterfaceTester(unittest.TestCase):
         conn.close()
 
     def test_onboard_interface(self):
-        
-        
         conn, _ = self.server.accept()
-
         self.test_interface.handle_client(conn)
-
         conn.close()
+
+        conn, _ = self.server.accept()
+        self.test_interface.handle_client(conn)
+        conn.close()
+
+        conn, _ = self.server.accept()
+        self.test_interface.handle_client(conn)
+        conn.close()
+
 
         
