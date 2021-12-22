@@ -187,6 +187,9 @@ class OnBoardInterfaceTester(unittest.TestCase):
             test_file.set_information()
             self.test_interface.folder.files.append(test_file)
 
+        self.test_interface.folder.files[0].set_valid(False)
+        self.test_interface.folder.files[1].set_sent_to_onboard_systems(True)
+
         conn, _ = self.server.accept()
         self.test_interface.handle_client(conn)
         
