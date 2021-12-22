@@ -69,6 +69,12 @@ class InterfaceOnboardSystems(threading.Thread):
         conn.send(response_length)
         conn.send(response.encode())
 
+    def close_connection(self, conn):
+        print("[Client handler] closing connection ... ")
+        conn.close()
+        print("[Client handler] connection closed")
+        print()
+
     def choose_request(self, request_type, category = [], valid = True, **kwargs):
         if request_type == "latest":
             return LatestRequest(self.folder, valid)
@@ -85,7 +91,7 @@ class InterfaceOnboardSystems(threading.Thread):
             print("[Client handler] received message properly!")
         except ClientClosedConnectionError:
             print("[Client handler] client closed connection before sending the complete message")
-            conn.close()
+            self.close_connection(conn)
             return
         
         # Validates the request. If the request would be invalid it could cause the interface to crash.
@@ -96,7 +102,7 @@ class InterfaceOnboardSystems(threading.Thread):
 
             # Send an error message as reply
             self.send_error(conn, dict_request)
-            conn.close()
+            self.close_connection(conn)
             return
         print("[Client handler] message is validated properly")
 
@@ -107,7 +113,7 @@ class InterfaceOnboardSystems(threading.Thread):
 
             # Send an error message as reply
             self.send_error(conn, request)
-            conn.close()
+            self.close_connection(conn)
             return
         print("[Client handler] found request_type")
         
@@ -117,10 +123,8 @@ class InterfaceOnboardSystems(threading.Thread):
         print("[Client handler] request parsed")
         self.send_response(conn, response)
         print("[Client handler] response sent")
-        print("[Client handler] closing connection ... ")
-        conn.close()
-        print("[Client handler] connection closed")
-        print()
+
+        self.close_connection(conn)
 
     def run(self):
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
