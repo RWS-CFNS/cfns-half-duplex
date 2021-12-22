@@ -107,9 +107,9 @@ class OnBoardInterfaceTester(unittest.TestCase):
         result = LatestRequest(self.test_interface.folder).parse()
         self.assertEqual(result, expected_result)
 
-        # expected restult is the same as above
-        result = CategoryRequest(self.test_interface.folder).parse()
-        self.assertEqual(result, expected_result)
+        # expected restult is test_file.lines
+        result = CategoryRequest(self.test_interface.folder, "other").parse()
+        self.assertEqual(result, test_file.lines)
 
         expected_result = [[1, 4, "other", [1.1234, 5.6789]]]
         result = TestRequest(self.test_interface.folder).parse()
