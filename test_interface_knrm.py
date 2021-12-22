@@ -185,7 +185,7 @@ class OnBoardInterfaceTester(unittest.TestCase):
             test_file = File("")
             test_file.lines = information
             test_file.set_information()
-            self.test_interface.files.append(test_file)
+            self.test_interface.folder.files.append(test_file)
 
         conn, _ = self.server.accept()
         self.test_interface.handle_client(conn)
