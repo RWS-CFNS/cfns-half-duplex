@@ -175,15 +175,16 @@ class OnBoardInterfaceTester(unittest.TestCase):
     def test_onboard_interface(self):
         conn, _ = self.server.accept()
         self.test_interface.handle_client(conn)
-        conn.close()
+        
+        with self.assertRaises(OSError):
+            conn.send("1".encode())
 
-        conn, _ = self.server.accept()
-        self.test_interface.handle_client(conn)
-        conn.close()
+        for _ in range(7):
+            conn, _ = self.server.accept()
+            self.test_interface.handle_client(conn)
+            conn.close()
 
-        conn, _ = self.server.accept()
-        self.test_interface.handle_client(conn)
-        conn.close()
+        
 
 
         
