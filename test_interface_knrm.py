@@ -99,8 +99,10 @@ class OnBoardInterfaceTester(unittest.TestCase):
     def test_parse(self):
         test_file = File("")
         test_file.lines = [90,1,"other"]
+        test_file.set_information()
         test_file2 = File("")
         test_file2.lines = [10, 2, "weather"] 
+        test_file2.set_information()
         self.test_interface.folder.files = [test_file, test_file2]
 
         expected_result = [test_file.lines, test_file2.lines]
