@@ -38,14 +38,22 @@ class InterfaceOnboardSystems(threading.Thread):
         if not isinstance(request, dict): 
             return Error.NO_DICT
 
-        # Is a list so you can easily expand the required keys that request must contain.
-        required_keys = ["request_type"]
+        required_key = "request_type"
+        request_keys = request.keys()
 
-        for required_key in required_keys:
-            if not required_key in request.keys():
-                return Error.INCORRECT_FIELD
+        """
+            This checks if the request contains request_type. If not return an Error.
+            When request_type is by_category it checks if the request also contains the key category. When that key is not available it will return an Error. 
+            If there is a request_type present and it is not by_category return the request.
+        """
+        if required_key in request_keys:
+            if request[required_key] == "by_category" and not "category" in request_keys:
+                return Error.INCORRECT_FORMAT
+            else: 
+                return request
         else:
-            return request
+            return Error.INCORRECT_FORMAT
+      
     
     def send_error(self, conn, error):
         error_message = json.dumps({"reply": False, "error_message": error.value})

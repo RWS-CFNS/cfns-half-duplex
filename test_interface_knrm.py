@@ -4,6 +4,7 @@ import json
 from unittest.case import expectedFailure
 from Category import Category
 from Error import Error
+from File import File
 from InterfaceOnboardSystems import ClientClosedConnectionError, InterfaceOnboardSystems
 from Request import CategoryRequest, LatestRequest, TestRequest
 from Folder import Folder
@@ -17,7 +18,8 @@ class OnBoardInterfaceTester(unittest.TestCase):
         self.server.bind(("192.168.178.68", 8001))
         self.server.listen()
 
-        self.test_interface = InterfaceOnboardSystems("")
+        test_folder = Folder("")
+        self.test_interface = InterfaceOnboardSystems(test_folder)
 
     """
         Method to propely close the program without having sockets still open.
@@ -94,23 +96,39 @@ class OnBoardInterfaceTester(unittest.TestCase):
         result = self.test_interface.choose_request(**incorrect_input)
         self.assertEqual(result, expected_result)
 
+    def test_parse(self):
+        test_file = File("")
+        test_file.lines = [90,1,"other"]
+        self.test_interface.folder.files = [test_file]
+
+        expected_result = [(test_file.lines[0], test_file.lines[1:])]
+        result = LatestRequest(self.test_interface.folder).parse()
+        self.assertEqual(result, expected_result)
+
+        # expected restult is the same as above
+        result = CategoryRequest(self.test_interface.folder).parse()
+        self.assertEqual(result, expected_result)
+
+        expected_result = [[1, 4, "other", [1.1234, 5.6789]]]
+        result = TestRequest(self.test_interface.folder).parse()
+        self.assertEqual(result, expected_result)
+
     def test_build_response(self):
         test_information = [1,2,3,4]
-        test_folder = Folder("")
 
         # Tests if build_response returns the expected json string
         expected_result = json.dumps({"reply": True, "information": test_information})
-        result = LatestRequest(test_folder).build_response(test_information)
+        result = LatestRequest(self.test_interface.folder).build_response(test_information)
         self.assertEqual(result, expected_result)
 
         # expected_result is the same as above, so not redefined.
-        result = TestRequest(test_folder).build_response(test_information)
+        result = TestRequest(self.test_interface.folder).build_response(test_information)
         self.assertEqual(result, expected_result)
 
         # Tests if the buid_response returns a json string in the format defined in expected_result.
         category = Category.OTHER
         expected_result = json.dumps({"reply": True, "category": category.value, "information": test_information})
-        result = CategoryRequest(test_folder, category).build_response(test_information)
+        result = CategoryRequest(self.test_interface.folder, category).build_response(test_information)
         self.assertEqual(result, expected_result)
 
     def test_reply(self):
@@ -135,6 +153,12 @@ class OnBoardInterfaceTester(unittest.TestCase):
         conn.close()
 
     def test_onboard_interface(self):
-        ...
+        
+        
+        conn, _ = self.server.accept()
+
+        self.test_interface.handle_client(conn)
+
+        conn.close()
 
         

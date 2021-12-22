@@ -23,7 +23,7 @@ class Request(ABC):
     def build_information_list(self, files):
         information = []
         for file in files:
-            information.append((file.get_dab_id(), file.get_lines()[1:]))
+            information.append(file.get_lines())
 
         return information
 
@@ -64,7 +64,7 @@ class TestRequest(Request):
         super().__init__(folder)
 
     def build_information_list(self):
-        return [(1, 4, "other", (1.1234, 5,6789))]
+        return [[1, 4, "other", [1.1234, 5.6789]]]
 
     def parse(self):
         """To test the expandibility of the interface."""
