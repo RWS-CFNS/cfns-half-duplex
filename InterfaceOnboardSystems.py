@@ -73,7 +73,7 @@ class InterfaceOnboardSystems(threading.Thread):
         if request_type == "latest":
             return LatestRequest(self.folder, valid)
         elif request_type == "by_category":
-            return CategoryRequest(self.folder, category, valid)
+            return CategoryRequest(self.folder, valid, category)
         elif request_type == "test":
             return TestRequest(self.folder)
         else:
