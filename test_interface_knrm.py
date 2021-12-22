@@ -173,6 +173,20 @@ class OnBoardInterfaceTester(unittest.TestCase):
         conn.close()
 
     def test_onboard_interface(self):
+        file_information = [
+            [1,1,"location",[1.234, 5.678]],
+            [2,1,"weather"],
+            [3,1,"weather"],
+            [4,1,"other"],
+            [5,1,"other"]
+        ]
+        
+        for information in file_information:
+            test_file = File("")
+            test_file.lines = information
+            test_file.set_information()
+            self.test_interface.files.append(test_file)
+
         conn, _ = self.server.accept()
         self.test_interface.handle_client(conn)
         
