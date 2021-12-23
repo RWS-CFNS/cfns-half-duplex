@@ -109,6 +109,7 @@ class OnBoardInterfaceTester(unittest.TestCase):
         self.assertEqual(result, expected_result)
 
     def test_interface_parse(self):
+        valid = True
         test_file = File("")
         test_file.lines = [90,1,"other"]
         test_file.set_information()
@@ -118,14 +119,14 @@ class OnBoardInterfaceTester(unittest.TestCase):
         self.test_interface.folder.files = [test_file, test_file2]
 
         expected_result = [test_file.lines, test_file2.lines]
-        result = LatestRequest(self.test_interface.folder, True).parse()
+        result = LatestRequest(self.test_interface.folder, valid).parse()
         self.assertEqual(result, expected_result)
 
         # parse changed the files so we need to reset a field value in the test_files
         test_file.sent_to_onboard_systems = False
         test_file2.sent_to_onboard_systems = False 
 
-        result = CategoryRequest(self.test_interface.folder, True, "other").parse()
+        result = CategoryRequest(self.test_interface.folder, valid, "other").parse()
         self.assertEqual(result, [test_file.lines])
 
         # This test does not need new files because it does not use files but a hard coded list for testing purposes.
@@ -135,10 +136,11 @@ class OnBoardInterfaceTester(unittest.TestCase):
 
     def test_interface_build_response(self):
         test_information = [1,2,3,4]
+        valid = True
 
         # Tests if build_response returns the expected json string
         expected_result = json.dumps({"reply": True, "information": test_information})
-        result = LatestRequest(self.test_interface.folder).build_response(test_information)
+        result = LatestRequest(self.test_interface.folder, valid).build_response(test_information)
         self.assertEqual(result, expected_result)
 
         # expected_result is the same as above, so not redefined.
@@ -148,7 +150,7 @@ class OnBoardInterfaceTester(unittest.TestCase):
         # Tests if the buid_response returns a json string in the format defined in expected_result.
         category = Category.OTHER
         expected_result = json.dumps({"reply": True, "category": category.value, "information": test_information})
-        result = CategoryRequest(self.test_interface.folder, category).build_response(test_information)
+        result = CategoryRequest(self.test_interface.folder, valid, category).build_response(test_information)
         self.assertEqual(result, expected_result)
 
     def test__interface_reply(self):
