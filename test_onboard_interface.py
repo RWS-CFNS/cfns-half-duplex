@@ -54,7 +54,7 @@ class OnBoardInterfaceTester(unittest.TestCase):
     """
     def test_interface_validate_message(self):
         # Tests if the interface can validate the input true when a message is a dict and send in json format.
-        correct_message = json.dumps({"test": True})
+        correct_message = json.dumps({"request_type": "test"})
         expected_result = json.loads(correct_message)
         result = self.test_interface.extract_request(correct_message)
         self.assertEqual(result, expected_result)
