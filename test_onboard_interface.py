@@ -118,14 +118,14 @@ class OnBoardInterfaceTester(unittest.TestCase):
         self.test_interface.folder.files = [test_file, test_file2]
 
         expected_result = [test_file.lines, test_file2.lines]
-        result = LatestRequest(self.test_interface.folder).parse()
+        result = LatestRequest(self.test_interface.folder, True).parse()
         self.assertEqual(result, expected_result)
 
         # parse changed the files so we need to reset a field value in the test_files
         test_file.sent_to_onboard_systems = False
         test_file2.sent_to_onboard_systems = False 
 
-        result = CategoryRequest(self.test_interface.folder, "other").parse()
+        result = CategoryRequest(self.test_interface.folder, True, "other").parse()
         self.assertEqual(result, [test_file.lines])
 
         # This test does not need new files because it does not use files but a hard coded list for testing purposes.
