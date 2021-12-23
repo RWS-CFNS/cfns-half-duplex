@@ -47,7 +47,7 @@ def test_reply_interface():
 
     client.close()
 
-def test_interface():
+def test_onboard_interface():
     client = setupSocket() 
     client.close()
     
@@ -77,8 +77,8 @@ def main():
         test_failed_receive()
     elif choice == "test_interface_reply":
         test_reply_interface() 
-    elif choice == "test_interface":
-        test_interface() 
+    elif choice == "test_onboard_interface":
+        test_onboard_interface() 
     else:
         return
 
