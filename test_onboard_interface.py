@@ -52,7 +52,7 @@ class OnBoardInterfaceTester(unittest.TestCase):
     """
         This test checks if the interface can validate input true when send correctly and validate false when send incorrectly.
     """
-    def test_interface_validate_input(self):
+    def test_interface_validate_message(self):
         # Tests if the interface can validate the input true when a message is a dict and send in json format.
         correct_message = json.dumps({"test": True})
         expected_result = json.loads(correct_message)
