@@ -2,7 +2,7 @@ from test_wifi import WifiConfirmTester
 from test_half_duplex import MyTestCase
 from test_choosing_devices import ChoosingDevicesTester
 from test_retrying_ack import RetryingAckTester
-from test_interface_knrm import OnBoardInterfaceTester
+from test_onboard_interface import OnBoardInterfaceTester
 import unittest
 
 def main():

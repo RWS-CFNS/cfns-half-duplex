@@ -108,7 +108,7 @@ class OnBoardInterfaceTester(unittest.TestCase):
         result = self.test_interface.choose_request(**incorrect_input)
         self.assertEqual(result, expected_result)
 
-    def test_parse(self):
+    def test_interface_parse(self):
         test_file = File("")
         test_file.lines = [90,1,"other"]
         test_file.set_information()
@@ -133,7 +133,7 @@ class OnBoardInterfaceTester(unittest.TestCase):
         result = TestRequest(self.test_interface.folder).parse()
         self.assertEqual(result, expected_result)
 
-    def test_build_response(self):
+    def test_interface_build_response(self):
         test_information = [1,2,3,4]
 
         # Tests if build_response returns the expected json string
@@ -151,7 +151,7 @@ class OnBoardInterfaceTester(unittest.TestCase):
         result = CategoryRequest(self.test_interface.folder, category).build_response(test_information)
         self.assertEqual(result, expected_result)
 
-    def test_reply(self):
+    def test__interface_reply(self):
         conn, _ = self.server.accept()
 
         test_response = "test_response"
