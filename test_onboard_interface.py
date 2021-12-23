@@ -153,7 +153,7 @@ class OnBoardInterfaceTester(unittest.TestCase):
         result = CategoryRequest(self.test_interface.folder, valid, category).build_response(test_information)
         self.assertEqual(result, expected_result)
 
-    def test__interface_reply(self):
+    def test_interface_reply(self):
         conn, _ = self.server.accept()
 
         test_response = "test_response"
