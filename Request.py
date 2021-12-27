@@ -18,8 +18,8 @@ class Request(ABC):
     def get_files(self, field, value, valid):
         files = self.folder.find_files_by_field(field, value)
         
-        # Filter all the File objects out of the list that are not valid and have already been sent.
-        files = [file for file in files if file.get_valid() == valid and not file.get_sent_to_onboard_systems()]
+        # Filter all the File objects out of the list that are not valid
+        files = [file for file in files if file.get_valid() == valid]
 
         # Update the field sent_to_onboard_systems for every file in files.
         [file.set_sent_to_onboard_systems(True) for file in files]
