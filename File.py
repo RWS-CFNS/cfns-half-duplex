@@ -51,7 +51,7 @@ class File:
         self.message_type = int(self.lines[1])
         self.category = Category(self.lines[2]) 
 
-        if len(self.lines) > 3 and isinstance(Category.LOCATION):  
+        if len(self.lines) > 3 and self.category == Category.LOCATION:  
             self.coordinates = (float(self.lines[3]), float(self.lines[4]))
 
     def set_status(self, status):
