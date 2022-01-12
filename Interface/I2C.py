@@ -48,7 +48,7 @@ class I2C:
                 pass
 
     def write(self, data):  
-        # Create an I2C read message   
+        # Create an I2C write message   
         msg = i2c_msg.write(self.target_address, data)
 
         self.bus.i2c_rdwr(msg)

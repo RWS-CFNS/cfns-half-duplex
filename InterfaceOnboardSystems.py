@@ -9,7 +9,7 @@ class ClientClosedConnectionError(Exception):
     """This error is raised when the client closes the connection without the disconnect message."""
 
 class InterfaceOnboardSystems(threading.Thread):
-    def __init__(self, folder, max_msg_length = 10) -> None:
+    def __init__(self, folder, max_msg_length = 10):
         threading.Thread.__init__(self)
         self.folder = folder
         self.max_msg_length = max_msg_length

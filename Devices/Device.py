@@ -56,11 +56,11 @@ class Device:
             print("Unknown strategy to device.has_reach()!")
             return False
         
-    def set_strategy(self, strategy):
-        self.strategy = strategy
-    
     def get_strategy(self):
         return self.strategy
+        
+    def set_strategy(self, strategy):
+        self.strategy = strategy
 
     def get_name(self):
         return self.name

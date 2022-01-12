@@ -28,9 +28,9 @@ class Ethernet:
     def set_port(self, new_socket_port):
         self.socket_port = new_socket_port
 
-    def init_socket(self, IP, PORT):
-        self.ip_address = IP
-        self.socket_port = PORT
+    def init_socket(self, ip_address, socket_port):
+        self.ip_address = ip_address
+        self.socket_port = socket_port
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     def connect_socket(self):

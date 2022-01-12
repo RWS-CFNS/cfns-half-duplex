@@ -29,7 +29,6 @@ from Interface.SPI import SPI
 from Interface.UART import UART
 from Status import Status
 
-import main
 from File import File
 from Folder import Folder
 from Devices.Device import Device
