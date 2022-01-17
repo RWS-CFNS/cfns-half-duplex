@@ -13,7 +13,7 @@ client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client.connect(("192.168.178.68", 8001))
 
 # Build message
-message = json.dumps({"request_type": "latest", "valid": False}).encode()
+message = json.dumps({"request_type": "latest"}).encode()
 message_length = pad_msg_length(max_msg_length, len(message))
 
 # Send message 

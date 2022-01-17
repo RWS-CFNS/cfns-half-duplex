@@ -5,3 +5,4 @@ class Category(enum.Enum):
     WEATHER = "weather"
     LOCATION = "location"
     OTHER = "other"
+    CAP = "CAP"
