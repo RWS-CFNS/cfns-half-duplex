@@ -16,8 +16,10 @@ Following features are provided
 - Read provided devices and settings from devices.csv
 - Observe folder for identifying new DAB+ message
 - Read content of DAB+ message
-- Sending acknowledgement by AIS, LoRaWAN and 4G
+- Sending acknowledgement by AIS, LoRaWAN and 4G, WiFi
 - Supported interfaces: UART, I2C, Socket and SPI
+- Share information from DAB+ messages on request using an interface
+- Select the best technology to acknowledge DAB+ messages
 
 ## Requirements
 
@@ -35,6 +37,31 @@ Following features are provided
 - True Heading AIS Class A Base Station
 - Sodaq One Rev3
 - Pycom FiPy
+
+## Setups
+
+In order for the system being able to acknowledge DAB+ messages using the supported hardware and technologies you need to set them up first. The following section will guide you setting up the different technologies for the different hardware.
+
+### AIS Setup
+1. Connect The True Heading AIS Base Station to the Raspberry Pi by USB.
+2. Make sure that [devices.csv](devices.csv) contains the following at the first line:
+````text
+name,branch,model,interface_type,address,setting,technology,priority
+````
+3. If you want to only use AIS remove everything from the file except for the first line. After that add the following to the file directly below the first line:
+````text
+AIS Base Station,True Heading,Carbon Pro,0,/dev/ttyACM0,38400,AIS,0
+````
+4. If you want to add AIS to the list of technologies the system can use add the line shown above directly below the other files. Also make sure that the other devices/technologies are supported and described properly.
+5. Furthermore make sure that _/dev/ttyACM0_ is being used by the FiPy for the AIS device.
+6. To check this unplug the Base Station from the Raspberry Pi and run the following command on the Raspberry Pi:
+````text
+ls /dev/tty*
+````
+7. Plug the Base Station back in and rerun the command. Then see which _/dev/tty_ was added and that is the USB port the Base Station uses.
+
+
+
 
 ## Examples
 
