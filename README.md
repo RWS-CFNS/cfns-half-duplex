@@ -4,6 +4,11 @@ This project is part of the proof of concept Multi Connectivity. The purpose of 
 new DAB+ messages. With the contained data an acknowledgement needs to be send back with
 the use of multiple wireless connections. For more information read the thesis (500770588-Afstudeerrapport-final.docx) on the OneDrive.
 
+This application interfaces with dab-receiver, cap-dab-server and cfns-webapp.
+See the diagram below.
+
+![Integration with other CFNS systems](integration.png)
+
 ## Features
 
 Following features are provided
