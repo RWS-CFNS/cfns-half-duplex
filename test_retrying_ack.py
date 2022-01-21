@@ -1,3 +1,11 @@
+'''
+project: slimmer maken multiconnectivity modem
+author: Frank Montenij
+Description: A testcase to test the retrying of failed acknowledgments
+
+Changelog: Frank created the file.
+'''
+
 import time
 import unittest
 from Folder import Folder

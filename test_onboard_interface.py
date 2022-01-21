@@ -1,3 +1,11 @@
+'''
+project: slimmer maken multiconnectivity modem
+author: Frank Montenij
+Description: A testcase to test the onboard interface
+
+Changelog: Frank created the file.
+'''
+
 import unittest
 import socket
 import json

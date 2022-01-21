@@ -1,3 +1,11 @@
+'''
+project: half-duplex, slimmer maken multiconnectivity modem
+author: Alfred Espinosa Encarnación, Frank Montenij
+Description: A class which represents an connection using Ethernet.
+            
+Changelog: Alfred created the file and Frank rewrote write and read. Also Frank added a helper function pad_msg_length.
+'''
+
 import socket
 import json
 

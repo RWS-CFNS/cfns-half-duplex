@@ -1,3 +1,11 @@
+'''
+project: slimmer maken multiconnectivity modem
+author: Frank Montenij
+Description: A class which represents a testcase with test as method to test the choosing a technology logic.
+
+Changelog: Frank created the file.
+'''
+
 import unittest
 from Folder import Folder
 import main

@@ -1,3 +1,11 @@
+'''
+project: slimmer maken multiconnectivity modem
+author: Frank Montenij
+Description: This file contains the logic of choosing a test from a supported testcase which the user can choose.
+
+Changelog: Frank created the file.
+'''
+
 from test_wifi import WifiConfirmTester
 from test_half_duplex import MyTestCase
 from test_choosing_devices import ChoosingDevicesTester

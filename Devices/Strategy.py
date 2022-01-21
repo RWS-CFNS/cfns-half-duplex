@@ -1,3 +1,11 @@
+'''
+project: half-duplex, slimmer maken multiconnectivity modem
+author: Alfred Espinosa Encarnación, Frank Montenij
+Description: A class which represents the different strategies for communicating with physical devices.
+            
+Changelog: Frank created the file, but used Alfred his code in the communicate methods for the classes: I2CStrategy, SPIStrategy and AISStrategy.
+'''
+
 from abc import ABC, abstractmethod
 import aisutils
 import time

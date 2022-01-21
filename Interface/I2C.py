@@ -19,6 +19,14 @@
 #    along with cfns-half-duplex. If not, see <https://www.gnu.org/licenses/>.
 #
 
+'''
+project: half-duplex, slimmer maken multiconnectivity modem
+author: Alfred Espinosa Encarnación, Frank Montenij
+Description: A class which represents an connection using I2C.
+            
+Changelog: Alfred created the file and Frank rewrote write and read. Also Frank changed the variable name for the address to target_address.
+'''
+
 from smbus2 import SMBus, i2c_msg
 
 class I2C:

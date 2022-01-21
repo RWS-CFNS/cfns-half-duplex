@@ -1,3 +1,11 @@
+'''
+project: slimmer maken multiconnectivity modem
+author: Frank Montenij
+Description: A class which represents the different statuses a File can have. With some helper functions to change the status.
+            
+Changelog: Frank created the file.
+'''
+
 import enum
 
 class Status(enum.Enum):

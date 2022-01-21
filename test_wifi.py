@@ -1,3 +1,11 @@
+'''
+project: slimmer maken multiconnectivity modem
+author: Frank Montenij
+Description: A testcase to test the acknwoledging of DAB messages using WiFi.
+
+Changelog: Frank created the file.
+'''
+
 from File import File
 from Folder import Folder
 from Status import Status

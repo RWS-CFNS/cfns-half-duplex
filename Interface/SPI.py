@@ -19,6 +19,14 @@
 #    along with cfns-half-duplex. If not, see <https://www.gnu.org/licenses/>.
 #
 
+'''
+project: half-duplex, slimmer maken multiconnectivity modem
+author: Alfred Espinosa Encarnación, Frank Montenij
+Description: A class which represents an connection using SPI.
+            
+Changelog: Alfred created the file and Frank rewrote write and read.
+'''
+
 import spidev # type: ignore this line
 
 

@@ -19,6 +19,16 @@
 #    along with cfns-half-duplex. If not, see <https://www.gnu.org/licenses/>.
 #
 
+'''
+project: half-duplex, slimmer maken multiconnectivity modem
+author: Alfred Espinosa Encarnación, Frank Montenij
+Description: A class which represents a .txt file containing the DAB message.
+            
+Changelog: Alfred created the file.
+           Frank added different field values to it. The fields category, status, coordinates, valid, sent_to_onboard_systems and time_of_arrival are added by Frank.
+           Frank also changed set_information to support different category messages.
+'''
+
 import time
 import os
 from Status import Status

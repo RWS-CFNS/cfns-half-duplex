@@ -19,6 +19,14 @@
 #    along with cfns-half-duplex. If not, see <https://www.gnu.org/licenses/>.
 #
 
+'''
+project: half-duplex, slimmer maken multiconnectivity modem
+author: Alfred Espinosa Encarnación, Frank Montenij
+Description: A class which represents a testcase with test as method to test the half-duplex system.
+
+Changelog: Alfred created the file and Frank updated the file to make it work again.
+'''
+
 import time
 import unittest
 from Category import Category

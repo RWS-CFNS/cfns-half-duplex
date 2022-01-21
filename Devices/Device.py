@@ -1,4 +1,17 @@
 #!/usr/bin/python
+
+'''
+project: half-duplex, slimmer maken multiconnectivity modem
+author: Alfred Espinosa Encarnación, Frank Montenij
+Description: A class which represents the physical device that will send the acknowledgment using the supported technologies.
+             It has the methods it need to communicate with the device and store information about the device.
+            
+Changelog: Alfred made the first version.
+           Frank added the fields: technology, priority and removed the other fields except for: name, branch and model.
+           Frank changed the relation with the Interface class by adding a Strategy class in between.
+           Frank added methods: acknowledge, has_reach and removed the other function that were left when an Interface was directly used.
+'''
+
 from Devices.Strategy import AISStrategy, EthernetStrategy, I2CStrategy
 
 class Device:

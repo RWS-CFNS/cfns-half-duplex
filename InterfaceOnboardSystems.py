@@ -1,3 +1,13 @@
+'''
+project: slimmer maken multiconnectivity modem
+author: Frank Montenij
+Description: This is the interface which is able to receive requests of data that the half-duplex system stores and receives.
+             It is able to get a specific set of files that the client wants or is able to send back test data.
+             First it will validate the message.
+            
+Changelog: Frank created the file.
+'''
+
 import socket
 import threading
 import json

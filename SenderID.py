@@ -1,3 +1,12 @@
+'''
+project: slimmer maken multiconnectivity modem
+author: Frank Montenij
+Description: A class that can generate an id which the system on land uses to seperate the different messages sent from the different ships.
+             This class does not only generate the ID, but also is responsible for retrieving the id from a file and storing it to a file.
+            
+Changelog: Frank created the file.
+'''
+
 import uuid
 import os
 

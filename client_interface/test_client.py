@@ -1,3 +1,9 @@
+'''
+project: slimmer maken multiconnectivity modem
+author: Frank Montenij
+Description: A test application to test the interface wich connects the half-duplex system with the onboard systems.
+'''
+
 import socket
 import json
 

@@ -1,3 +1,11 @@
+'''
+project: slimmer maken multiconnectivity modem
+author: Frank Montenij
+Description: These classes represent the different requests the interface supports.
+            
+Changelog: Frank created the file.
+'''
+
 import json
 from abc import ABC, abstractmethod
 

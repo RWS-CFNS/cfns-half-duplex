@@ -1,3 +1,16 @@
+'''
+project: half-duplex, slimmer maken multiconnectivity modem
+author: Alfred Espinosa Encarnación, Frank Montenij
+Description: This file is the file which contains the logic that can detect a DAB message (.txt file ) coming in and contains the logic that starts the acknowledgment process. 
+             But als retries acknowledgments, start the interface for the onboard systems and stores the status of each DAB message.
+            
+Changelog: Alfred created the file.
+           Frank added the part making the system able to choose the best device possible for acknowledging instead of using all devices.
+           Frank added the part making the system able to use WiFi as a supported technology.
+           Frank improved the system by moving the statement that attaches the devices which increases the uptime.
+           Frank improved the code for more details see the commits in the github.
+'''
+
 import os
 import sys
 import argparse

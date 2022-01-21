@@ -19,6 +19,16 @@
 #    along with cfns-half-duplex. If not, see <https://www.gnu.org/licenses/>.
 #
 
+'''
+project: half-duplex, slimmer maken multiconnectivity modem
+author: Alfred Espinosa Encarnación, Frank Montenij
+Description: A class which represents a folder which contains File objects.
+            
+Changelog: Alfred created the file.
+           Frank added the methods: find_file_by_dab_id, find_files_by_field and update_file.
+           He also added a lock to prevent error when the half-duplex system and interface are accessing the folder at the same time.
+'''
+
 from File import File
 import threading
 

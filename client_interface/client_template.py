@@ -1,3 +1,9 @@
+'''
+project: slimmer maken multiconnectivity modem
+author: Frank Montenij
+Description: A template that can be used to request data from the half-duplex system. 
+'''
+
 import socket
 import json
 
