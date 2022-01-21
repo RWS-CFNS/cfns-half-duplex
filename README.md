@@ -42,6 +42,7 @@ Following features are provided
 In order for the system being able to acknowledge DAB+ messages using the supported hardware and technologies you need to set them up first. The following section will guide you setting up the different technologies for the different hardware.
 
 ### Wifi Setup
+1. Follow the setup for the server in the repository: [Wifi6_confirmation_server](https://github.com/PoCDAB/Wifi6_confirmation_server).
 1. Follow the setup for WiFi in the repository: [cfns-hd-fipy](https://github.com/PoCDAB/cfns-hd-fipy).
 2. Make sure that [devices.csv](devices.csv) contains the following at the first line:
 ````text
