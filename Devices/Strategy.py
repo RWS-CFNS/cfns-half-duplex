@@ -1,8 +1,5 @@
-from aisutils import nmea
-from aisutils import BitVector
-from aisutils import binary
-
 from abc import ABC, abstractmethod
+import aisutils
 import time
 
 class Strategy(ABC):
@@ -108,9 +105,9 @@ class AISStrategy(Strategy):
                 msg = '  ACK:' + str(data.get("dab_id")) + ',MSG:' + str(data.get("message_type")) + ''
             
             # Convert msg string to nmea string
-            aisBits = BitVector.BitVector(textstring=msg)
-            payloadStr, pad = binary.bitvectoais6(aisBits)  # [0]
-            buffer = nmea.bbmEncode(1, 1, 0, 1, 8, payloadStr, pad, appendEOL=False)
+            aisBits = aisutils.BitVector.BitVector(textstring=msg)
+            payloadStr, pad = aisutils.binary.bitvectoais6(aisBits)  # [0]
+            buffer = aisutils.nmea.bbmEncode(1, 1, 0, 1, 8, payloadStr, pad, appendEOL=False)
             self.interface.write(buffer)
             return True
         except Exception as e:
